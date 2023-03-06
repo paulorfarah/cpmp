@@ -25,8 +25,8 @@ def compare_classes(pathA, pathB, currentCommit, previousCommit):
             file2 = args.absolutePath+"projectB" + file_temp
             #classPreviousCommit classCurrentCommit csvPath projectName currentCommit previousCommit
 
-            subprocess.call(['java', '-jar', 'JMethodsExtractor-0.0.1-SNAPSHOT-jar-with-dependencies.jar', 'file', file, currentCommit])
-            subprocess.call(['java', '-jar', 'JMethodsExtractor-0.0.1-SNAPSHOT-jar-with-dependencies.jar', 'file', file2, previousCommit])
+            subprocess.call(['/usr/lib/jvm/java-19-openjdk-amd64/bin/java', '-jar', 'JMethodsExtractor-0.0.1-SNAPSHOT-jar-with-dependencies.jar', 'file', file, currentCommit])
+            subprocess.call(['/usr/lib/jvm/java-19-openjdk-amd64/bin/java', '-jar', 'JMethodsExtractor-0.0.1-SNAPSHOT-jar-with-dependencies.jar', 'file', file2, previousCommit])
 
             methods_path_A = 'results/' + currentCommit + file
             method_files_A = [f for f in listdir(methods_path_A) if isfile(join(methods_path_A, f))]
@@ -36,12 +36,12 @@ def compare_classes(pathA, pathB, currentCommit, previousCommit):
                 if any(method_file == f for f in method_files_B):
                     method_file_B = methods_path_B + '/' + method_file
                     method_file_A = methods_path_A + '/' + method_file
-                    cd_cmd = 'java -jar ChangeDistillerReader-0.0.1-SNAPSHOT-jar-with-dependencies.jar "' + method_file_B + '" "' + method_file_A + '" ' + csvPath + ' ' + args.projectName + ' ' + currentCommit + ' ' + previousCommit
+                    cd_cmd = '/usr/lib/jvm/java-8-openjdk-amd64/bin/java -jar ChangeDistillerReader-0.0.1-SNAPSHOT-jar-with-dependencies.jar ' + method_file_B + ' ' + method_file_A + ' ' + csvPath + ' ' + args.projectName + ' ' + currentCommit + ' ' + previousCommit
                     print(cd_cmd)
                     # subprocess.call(['java', '-jar', 'ChangeDistillerReader-0.0.1-SNAPSHOT-jar-with-dependencies.jar',
                     #                  '"' + method_file_B + '"', '"' + method_file_A + '"', csvPath, args.projectName, currentCommit, previousCommit])
-                    print(subprocess.check_output((['java', '-jar', 'ChangeDistillerReader-0.0.1-SNAPSHOT-jar-with-dependencies.jar',
-                                     '"' + method_file_B + '"', '"' + method_file_A + '"', csvPath, args.projectName, currentCommit, previousCommit])))
+                    print(subprocess.check_output((['/usr/lib/jvm/java-8-openjdk-amd64/bin/java', '-jar', 'ChangeDistillerReader-0.0.1-SNAPSHOT-jar-with-dependencies.jar',
+                                     method_file_B, method_file_A, csvPath, args.projectName, currentCommit, previousCommit])))
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description='Extractor for changeDistiller')
