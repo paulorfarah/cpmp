@@ -59,7 +59,6 @@ if __name__ == "__main__":
     f = open(csvPath, "w")
     writer = csv.writer(f)
     for tag in tags:
-
         hashCurrent = pathA.get_commit_from_tag(tag.name).hash
         pathA.checkout(hashCurrent)
         if (commit_B == ''):
