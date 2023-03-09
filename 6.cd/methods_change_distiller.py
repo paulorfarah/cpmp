@@ -19,7 +19,7 @@ def transform_method_to_class(method_file):
     with open(method_file, 'r') as f:
         code = f.readlines()
         if not code[0].startswith(class_sig):
-            code.insert(0, )
+            code.insert(0, class_sig)
             code.append('}')
     with open(file_name, 'w') as fw:
         fw.writelines(code)
@@ -55,11 +55,13 @@ def compare_classes(pathA, pathB, currentCommit, previousCommit):
             try:
                 method_files_A = [f for f in listdir(methods_path_A) if isfile(join(methods_path_A, f))]
             except FileNotFoundError:
-                print('[>>>FileNotFound]: ' + method_file_A + '! \n Check if class has methods...')
+                if method_files_A:
+                    print('[>>>FileNotFound]: ' + methods_path_A + '! \n Check if class has methods...')
             try:
                 method_files_B = [f for f in listdir(methods_path_B) if isfile(join(methods_path_B, f))]
             except FileNotFoundError:
-                print('[>>>FileNotFound]: ' + method_file_B + '! \n Check if class has methods...')
+                if method_files_B:
+                    print('[>>>FileNotFound]: ' + methods_path_B + '! \n Check if class has methods...')
 
             if method_files_A and method_files_B:
                 for method_file in method_files_A:
