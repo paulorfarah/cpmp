@@ -28,9 +28,21 @@ def transform_method_to_class(method_file):
     return file_name
 
 
+# def count_metrics_between_releases(modified_file, path_curr, path_prev):
+#     previous_commit = None
+#     for current_commit in commits_list:
+#         if not previous_commit:
+#             # first commit
+#             previous_commit = current_commit
+#         else:
+#             path_curr.checkout(current_commit)
+#             path_prev.checkout(current_commit)
+#
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description='Extract process metrics')
     ap.add_argument('--pathA', required=True)
+    ap.add_argument('--pathB', required=True)
     ap.add_argument('--project_name', required=True)
     ap.add_argument('--java', required=True)
     args = ap.parse_args()
@@ -38,6 +50,7 @@ if __name__ == "__main__":
     # folder with repo: projectA and projectB
 
     pathA = pydriller.Git(args.pathA)
+    pathB = pydriller.Git(args.pathB)
     repo = git.Repo(args.pathA)
     tags = repo.tags
 
@@ -116,6 +129,7 @@ if __name__ == "__main__":
             acdf = 0
             hashPrevious = pathA.get_commit_from_tag(commit_A.name).hash
 
+
             for file in filesA:
                 # '/usr/lib/jvm/java-19-openjdk-amd64/bin/java'
                 subprocess.call([args.java, '-jar',
@@ -164,37 +178,52 @@ if __name__ == "__main__":
                         # get all commits from release n-1 to n, the goal is to find the total amount of changes on a file
                         commits_touching_path = Repository(args.pathA, from_commit=hashPrevious,
                                                            to_commit=hashCurrent).traverse_commits()
-                        file_temp = method_short_name.replace(
-                            absolutePath + args.pathA + args.project_name + "/", '')
+                        # file_temp = method_short_name.replace(
+                        #     absolutePath + args.pathA + args.project_name + "/", '')
                         added_lines = 0
                         removed_lines = 0
                         loc = 0
-                        for cc in commits_touching_path:
-                            modifiedFiles = [x for x in cc.modified_files if x.filename.endswith('.java')]
-                            for modified_file in modifiedFiles:
+                        previous_commit = None
+                        for current_commit in commits_touching_path:
+                            if not previous_commit:
+                                # first commit
+                                previous_commit = current_commit
+                            else:
+                                pathB.checkout(previous_commit.hash)
+                            current_modified_files = [x for x in current_commit.modified_files if x.filename.endswith('.java')]
+                            # previous_files = pathB.files()
+                            for modified_file in current_modified_files:
+                                print(modified_file.filename)
+                                if modified_file.new_path:
+                                    print('new: ' + modified_file.new_path)
+                                if modified_file.old_path:
+                                    print('old: ' + modified_file.old_path)
+                                else:
+                                    print('old: None')
+                                print('-------------')
+                                # count_metrics_between_releases(modified_file.new_path, modified_file.old_path, pathA, pathB )
+                                # if (modified_file.change_type.name == 'ADD' and (
+                                #         modified_file.new_path == modified_file or modified_file.old_path == modified_file)):
+                                #     # size of
+                                #     csbsArray[method_short_name] = modified_file.nloc
+                                # if (modified_file.change_type.name == 'MODIFY' and (
+                                #         modified_file.new_path == modified_file or modified_file.old_path == modified_file)):
 
-                                if (modified_file.change_type.name == 'ADD' and (
-                                        modified_file.new_path == file_temp or modified_file.old_path == file_temp)):
-                                    # size of
-                                    csbsArray[method_short_name] = modified_file.nloc
-                                if (modified_file.change_type.name == 'MODIFY' and (
-                                        modified_file.new_path == file_temp or modified_file.old_path == file_temp)):
 
-
-                                    loc = modified_file.nloc
-                                    added_lines += modified_file.added_lines
-                                    removed_lines += modified_file.deleted_lines
-                                    # first time change
-                                    if (fchArray[method_short_name] == 0):
-                                        fchArray[method_short_name] = release
-                                        fch = release
-                                    # last time change, the lastest released analayzed
-                                    lhc = release
-                                    # if changes have occurred
-                                    cho = 1
-                                    # frequency of change
-                                    frchArray[method_short_name] += 1
-                                    frch = frchArray[method_short_name]
+                                    # loc = modified_file.nloc
+                                    # added_lines += modified_file.added_lines
+                                    # removed_lines += modified_file.deleted_lines
+                                    # # first time change
+                                    # if (fchArray[method_short_name] == 0):
+                                    #     fchArray[method_short_name] = release
+                                    #     fch = release
+                                    # # last time change, the lastest released analayzed
+                                    # lhc = release
+                                    # # if changes have occurred
+                                    # cho = 1
+                                    # # frequency of change
+                                    # frchArray[method_short_name] += 1
+                                    # frch = frchArray[method_short_name]
 
                         # total amount change, added lines + deleted lines (changed lines are already counted twice )
                         tach = added_lines + removed_lines
