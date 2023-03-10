@@ -31,7 +31,8 @@ def transform_method_to_class(method_file):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description='Extract process metrics')
     ap.add_argument('--pathA', required=True)
-    ap.add_argument('--projectName', required=True)
+    ap.add_argument('--project_name', required=True)
+    ap.add_argument('--java', required=True)
     args = ap.parse_args()
 
     # folder with repo: projectA and projectB
@@ -55,7 +56,7 @@ if __name__ == "__main__":
     acdfArray = {}
 
     absolutePath = os.getcwd() + '/'
-    csvPath = absolutePath + "results/" + args.projectName + "-methods-results-processMetrics.csv"
+    csvPath = absolutePath + "results/" + args.project_name + "-methods-results-processMetrics.csv"
     f = open(csvPath, "w")
     writer = csv.writer(f)
     for tag in tags:
@@ -72,7 +73,8 @@ if __name__ == "__main__":
                    'FRCH', 'CHD', 'WCD', 'WFR', 'ATAF', 'LCA', 'LCD', 'CSB', 'CSBS', 'ACDF']
             writer.writerow(row)
             for file in filesA:
-                subprocess.call(['/usr/lib/jvm/java-19-openjdk-amd64/bin/java', '-jar',
+                # '/usr/lib/jvm/java-19-openjdk-amd64/bin/java'
+                subprocess.call([args.java, '-jar',
                                  'JMethodsExtractor-0.0.1-SNAPSHOT-jar-with-dependencies.jar', 'file', file,
                                  hashCurrent])
 
@@ -88,12 +90,13 @@ if __name__ == "__main__":
                     for method_file in method_files_A:
                         method_file_A = methods_path_A + '/' + method_file
                         method_file_A_renamed = absolutePath + transform_method_to_class(method_file_A)
-                        if (method_file_A_renamed not in bocArray):
-                            bocArray[method_file_A_renamed] = release
-                            fchArray[method_file_A_renamed] = 0
+                        method_short_name = method_file_A_renamed.split(args.pathA, 1)[1]
+                        if (method_short_name not in bocArray):
+                            bocArray[method_short_name] = release
+                            fchArray[method_short_name] = 0
 
         else:
-            project = args.projectName
+            project = args.project_name
             commit = hashCurrent
             commitprevious = hashPrevious
             boc = release
@@ -114,7 +117,8 @@ if __name__ == "__main__":
             hashPrevious = pathA.get_commit_from_tag(commit_A.name).hash
 
             for file in filesA:
-                subprocess.call(['/usr/lib/jvm/java-19-openjdk-amd64/bin/java', '-jar',
+                # '/usr/lib/jvm/java-19-openjdk-amd64/bin/java'
+                subprocess.call([args.java, '-jar',
                                  'JMethodsExtractor-0.0.1-SNAPSHOT-jar-with-dependencies.jar', 'file', file,
                                  hashCurrent])
 
@@ -130,99 +134,102 @@ if __name__ == "__main__":
                     for method_file in method_files_A:
                         method_file_A = methods_path_A + '/' + method_file
                         method_file_A_renamed = absolutePath + transform_method_to_class(method_file_A)
-                        if (method_file_A_renamed not in bocArray):
-                            bocArray[method_file_A_renamed] = release
-                            fchArray[method_file_A_renamed] = 0
+                        method_short_name = method_file_A_renamed.split(args.pathA, 1)[1]
 
-                            if (method_file_A_renamed not in bocArray):
-                                bocArray[method_file_A_renamed] = release
-                                boc = release
-                            else:
-                                boc = bocArray.get(method_file_A_renamed)
-                            if (method_file_A_renamed not in fchArray):
-                                fchArray[method_file_A_renamed] = 0
-                            if (method_file_A_renamed not in frchArray):
-                                frchArray[method_file_A_renamed] = 0
-                            if (method_file_A_renamed not in wcdArray):
-                                wcdArray[method_file_A_renamed] = 0
-                            if (method_file_A_renamed not in wfrArray):
-                                wfrArray[method_file_A_renamed] = 0
-                            if (method_file_A_renamed not in lcaArray):
-                                lcaArray[method_file_A_renamed] = 0
-                            if (method_file_A_renamed not in lcdArray):
-                                lcdArray[method_file_A_renamed] = 0
-                            if (method_file_A_renamed not in csbArray):
-                                csbArray[method_file_A_renamed] = 0
-                            if (method_file_A_renamed not in csbsArray):
-                                csbsArray[method_file_A_renamed] = 0
-                            if (method_file_A_renamed not in acdfArray):
-                                acdfArray[method_file_A_renamed] = 0
-                            # get all commits from release n-1 to n, the goal is to find the total amount of changes on a file
-                            commits_touching_path = Repository(args.pathA, from_commit=hashPrevious,
-                                                               to_commit=hashCurrent).traverse_commits()
-                            file_temp = method_file_A_renamed.replace(
-                                absolutePath + "projectA/" + args.projectName + "/", '')
-                            added_lines = 0
-                            removed_lines = 0
-                            loc = 0
-                            for cc in commits_touching_path:
-                                modifiedFiles = [x for x in cc.modified_files if x.filename.endswith('.java')]
-                                for m in modifiedFiles:
-                                    if (m.change_type.name == 'ADD' and (
-                                            m.new_path == file_temp or m.old_path == file_temp)):
-                                        # size of
-                                        csbsArray[method_file_A_renamed] = m.nloc
-                                    if (m.change_type.name == 'MODIFY' and (
-                                            m.new_path == file_temp or m.old_path == file_temp)):
-                                        loc = m.nloc
-                                        added_lines += m.added_lines
-                                        removed_lines += m.deleted_lines
-                                        # first time change
-                                        if (fchArray[method_file_A_renamed] == 0):
-                                            fchArray[method_file_A_renamed] = release
-                                            fch = release
-                                        # last time change, the lastest released analayzed
-                                        lhc = release
-                                        # if changes have occurred
-                                        cho = 1
-                                        # frequency of change
-                                        frchArray[method_file_A_renamed] += 1
-                                        frch = frchArray[method_file_A_renamed]
+                        if method_short_name not in bocArray:
+                            bocArray[method_short_name] = release
+                            boc = release
+                        else:
+                            boc = bocArray.get(method_short_name)
+                        if method_short_name not in fchArray:
+                            fchArray[method_short_name] = 0
+                        if method_short_name not in frchArray:
+                            frchArray[method_short_name] = 0
+                        if method_short_name not in wcdArray:
+                            wcdArray[method_short_name] = 0
+                        if method_short_name not in wfrArray:
+                            wfrArray[method_short_name] = 0
+                        if method_short_name not in lcaArray:
+                            lcaArray[method_short_name] = 0
+                        if method_short_name not in lcdArray:
+                            lcdArray[method_short_name] = 0
+                        if method_short_name not in csbArray:
+                            csbArray[method_short_name] = 0
+                        if method_short_name not in csbsArray:
+                            csbsArray[method_short_name] = 0
+                        if method_short_name not in acdfArray:
+                            acdfArray[method_short_name] = 0
 
-                            # total amount change, added lines + deleted lines (changed lines are already counted twice )
-                            tach = added_lines + removed_lines
-                            if (tach > 0):
-                                chd = tach / loc
-                                # cumulative weight of change
-                                wcdArray[method_file_A_renamed] += tach * pow(2, boc - release)
-                                # sum of change density, to normalize later
-                                acdfArray[method_file_A_renamed] += chd
-                                # agregate change size, normalized by frequency change
-                                if (frch > 0):
-                                    ataf = tach / frch
-                                    # agregate change density normalized by frch
-                                    acdf = acdfArray[method_file_A_renamed] / frch
-                                # last amount of change
-                                lcaArray[method_file_A_renamed] = tach
-                                # last change density
-                                lcdArray[method_file_A_renamed] = chd
-                                csbArray[method_file_A_renamed] += tach
 
-                            wcd = wcdArray[method_file_A_renamed]
-                            wch = wcd * pow(2, boc - release)
-                            # cumultive weight frequecy
-                            wfrArray[method_file_A_renamed] += (release - 1) * cho
-                            wfr = wfrArray[method_file_A_renamed]
-                            lca = lcaArray[method_file_A_renamed]
-                            lcd = lcdArray[method_file_A_renamed]
-                            csb = csbArray[method_file_A_renamed]
-                            if (csb > 0):
-                                csbs = csbsArray[method_file_A_renamed] / csb
+                        # get all commits from release n-1 to n, the goal is to find the total amount of changes on a file
+                        commits_touching_path = Repository(args.pathA, from_commit=hashPrevious,
+                                                           to_commit=hashCurrent).traverse_commits()
+                        file_temp = method_short_name.replace(
+                            absolutePath + args.pathA + args.project_name + "/", '')
+                        added_lines = 0
+                        removed_lines = 0
+                        loc = 0
+                        for cc in commits_touching_path:
+                            modifiedFiles = [x for x in cc.modified_files if x.filename.endswith('.java')]
+                            for modified_file in modifiedFiles:
 
-                            row = [args.projectName, hashCurrent, hashPrevious, method_file_A_renamed, release, boc,
-                                   tach, fch, lch, cho, frch,
-                                   chd, wch, wfr, ataf, lca, lcd, csb, csbs, acdf]
-                            writer.writerow(row)
+                                if (modified_file.change_type.name == 'ADD' and (
+                                        modified_file.new_path == file_temp or modified_file.old_path == file_temp)):
+                                    # size of
+                                    csbsArray[method_short_name] = modified_file.nloc
+                                if (modified_file.change_type.name == 'MODIFY' and (
+                                        modified_file.new_path == file_temp or modified_file.old_path == file_temp)):
+
+
+                                    loc = modified_file.nloc
+                                    added_lines += modified_file.added_lines
+                                    removed_lines += modified_file.deleted_lines
+                                    # first time change
+                                    if (fchArray[method_short_name] == 0):
+                                        fchArray[method_short_name] = release
+                                        fch = release
+                                    # last time change, the lastest released analayzed
+                                    lhc = release
+                                    # if changes have occurred
+                                    cho = 1
+                                    # frequency of change
+                                    frchArray[method_short_name] += 1
+                                    frch = frchArray[method_short_name]
+
+                        # total amount change, added lines + deleted lines (changed lines are already counted twice )
+                        tach = added_lines + removed_lines
+                        if (tach > 0):
+                            chd = tach / loc
+                            # cumulative weight of change
+                            wcdArray[method_short_name] += tach * pow(2, boc - release)
+                            # sum of change density, to normalize later
+                            acdfArray[method_short_name] += chd
+                            # agregate change size, normalized by frequency change
+                            if (frch > 0):
+                                ataf = tach / frch
+                                # agregate change density normalized by frch
+                                acdf = acdfArray[method_short_name] / frch
+                            # last amount of change
+                            lcaArray[method_short_name] = tach
+                            # last change density
+                            lcdArray[method_short_name] = chd
+                            csbArray[method_short_name] += tach
+
+                        wcd = wcdArray[method_short_name]
+                        wch = wcd * pow(2, boc - release)
+                        # cumultive weight frequecy
+                        wfrArray[method_short_name] += (release - 1) * cho
+                        wfr = wfrArray[method_short_name]
+                        lca = lcaArray[method_short_name]
+                        lcd = lcdArray[method_short_name]
+                        csb = csbArray[method_short_name]
+                        if (csb > 0):
+                            csbs = csbsArray[method_short_name] / csb
+
+                        row = [args.project_name, hashCurrent, hashPrevious, method_short_name, release, boc,
+                               tach, fch, lch, cho, frch,
+                               chd, wch, wfr, ataf, lca, lcd, csb, csbs, acdf]
+                        writer.writerow(row)
 
         commit_A = tag
         release += 1
