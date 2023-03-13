@@ -1,5 +1,7 @@
+import filecmp
 import os
 import subprocess
+import sys
 from asyncore import write
 from os import listdir
 from os.path import isfile, join
@@ -28,7 +30,7 @@ def transform_method_to_class(method_file):
     return file_name
 
 
-# def count_metrics_between_releases(modified_file, path_curr, path_prev):
+# def count_metrics_between_releases(new_file, old_file h_prev):
 #     previous_commit = None
 #     for current_commit in commits_list:
 #         if not previous_commit:
@@ -38,6 +40,22 @@ def transform_method_to_class(method_file):
 #             path_curr.checkout(current_commit)
 #             path_prev.checkout(current_commit)
 #
+
+def read_method_files(hash, file, methods_path):
+    subprocess.call([args.java, '-jar',
+                     'JMethodsExtractor-0.0.1-SNAPSHOT-jar-with-dependencies.jar', 'file', file,
+                     hash])
+    method_files = None
+    try:
+        method_files = [f for f in listdir(methods_path) if isfile(join(methods_path, f))]
+    except FileNotFoundError:
+        print('[>>>FileNotFound]: Check if class has methods:')
+        if methods_path:
+            print(methods_path)
+        print('----------------------------------------------')
+    except:
+        print('[>>>Error]: extracting methods: ' + str(sys.exc_info()))
+    return method_files
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description='Extract process metrics')
@@ -49,16 +67,18 @@ if __name__ == "__main__":
 
     # folder with repo: projectA and projectB
 
-    pathA = pydriller.Git(args.pathA)
-    pathB = pydriller.Git(args.pathB)
+    path_A = pydriller.Git(args.pathA)
+    path_B = pydriller.Git(args.pathB)
+
+    #tags
     repo = git.Repo(args.pathA)
     tags = repo.tags
 
     release = 1
     commit_A = ''
     commit_B = ''
-    bocArray = {}
-    fchArray = {}
+    boc_list = {}
+    fch_list = {}
     frchArray = {}
     wcdArray = {}
     wfrArray = {}
@@ -68,50 +88,48 @@ if __name__ == "__main__":
     csbsArray = {}
     acdfArray = {}
 
-    absolutePath = os.getcwd() + '/'
-    csvPath = absolutePath + "results/" + args.project_name + "-methods-results-processMetrics.csv"
-    f = open(csvPath, "w")
+    absolute_path = os.getcwd() + '/'
+    csv_path = absolute_path + "results/" + args.project_name + "-methods-results-processMetrics.csv"
+    f = open(csv_path, "w")
     writer = csv.writer(f)
     for tag in tags:
-        hashCurrent = pathA.get_commit_from_tag(tag.name).hash
-        pathA.checkout(hashCurrent)
-        if (commit_B == ''):
-            hashPrevious = None
-        filesA = pathA.files()
+        hash_current = path_A.get_commit_from_tag(tag.name).hash
+        path_A.checkout(hash_current)
+        if commit_B == '':
+            hash_previous = None
+        filesA = path_A.files()
         filesA = [x for x in filesA if x.endswith('.java')]
 
-        if (release == 1):
+        if release == 1:
             commit_A = tag
             row = ['project', 'commit', 'commitprevious', 'class', 'release', 'BOC', 'TACH', 'FCH', 'LCH', 'CHO',
                    'FRCH', 'CHD', 'WCD', 'WFR', 'ATAF', 'LCA', 'LCD', 'CSB', 'CSBS', 'ACDF']
             writer.writerow(row)
             for file in filesA:
                 # '/usr/lib/jvm/java-19-openjdk-amd64/bin/java'
-                subprocess.call([args.java, '-jar',
-                                 'JMethodsExtractor-0.0.1-SNAPSHOT-jar-with-dependencies.jar', 'file', file,
-                                 hashCurrent])
-
-                methods_path_A = 'results/' + hashCurrent + file
-                method_files_A = None
-                try:
-                    method_files_A = [f for f in listdir(methods_path_A) if isfile(join(methods_path_A, f))]
-                except FileNotFoundError:
-                    if method_files_A:
-                        print('[>>>FileNotFound]: ' + methods_path_A + '! \n Check if class has methods...')
-
+                methods_path_A = 'results/' + hash_current + file
+                # subprocess.call([args.java, '-jar',
+                #                  'JMethodsExtractor-0.0.1-SNAPSHOT-jar-with-dependencies.jar', 'file', file,
+                #                  hash_current])
+                # method_files_A = None
+                # try:
+                #     method_files_A = [f for f in listdir(methods_path_A) if isfile(join(methods_path_A, f))]
+                # except FileNotFoundError:
+                #     if method_files_A:
+                #         print('[>>>FileNotFound]: ' + methods_path_A + '! \n Check if class has methods...')
+                method_files_A = read_method_files(hash_current, file, methods_path_A)
                 if method_files_A:
                     for method_file in method_files_A:
                         method_file_A = methods_path_A + '/' + method_file
-                        method_file_A_renamed = absolutePath + transform_method_to_class(method_file_A)
+                        method_file_A_renamed = absolute_path + transform_method_to_class(method_file_A)
                         method_short_name = method_file_A_renamed.split(args.pathA, 1)[1]
-                        if (method_short_name not in bocArray):
-                            bocArray[method_short_name] = release
-                            fchArray[method_short_name] = 0
+                        if (method_short_name not in boc_list):
+                            boc_list[method_short_name] = release
+                            fch_list[method_short_name] = 0
 
         else:
+            # release > 1
             project = args.project_name
-            commit = hashCurrent
-            commitprevious = hashPrevious
             boc = release
             tach = 0
             fch = 0
@@ -127,36 +145,27 @@ if __name__ == "__main__":
             csb = 0
             csbs = 0
             acdf = 0
-            hashPrevious = pathA.get_commit_from_tag(commit_A.name).hash
-
+            hash_previous = path_A.get_commit_from_tag(commit_A.name).hash
 
             for file in filesA:
-                # '/usr/lib/jvm/java-19-openjdk-amd64/bin/java'
-                subprocess.call([args.java, '-jar',
-                                 'JMethodsExtractor-0.0.1-SNAPSHOT-jar-with-dependencies.jar', 'file', file,
-                                 hashCurrent])
-
-                methods_path_A = 'results/' + hashCurrent + file
-                method_files_A = None
-                try:
-                    method_files_A = [f for f in listdir(methods_path_A) if isfile(join(methods_path_A, f))]
-                except FileNotFoundError:
-                    if method_files_A:
-                        print('[>>>FileNotFound]: ' + methods_path_A + '! \n Check if class has methods...')
+                methods_path_A = 'results/' + hash_current + file
+                method_files_A = read_method_files(hash_current, file, methods_path_A)
 
                 if method_files_A:
                     for method_file in method_files_A:
                         method_file_A = methods_path_A + '/' + method_file
-                        method_file_A_renamed = absolutePath + transform_method_to_class(method_file_A)
-                        method_short_name = method_file_A_renamed.split(args.pathA, 1)[1]
 
-                        if method_short_name not in bocArray:
-                            bocArray[method_short_name] = release
+                        #need to transform? I need to check, I don't think so...
+                        method_file_A_renamed = absolute_path + transform_method_to_class(method_file_A)
+
+                        method_short_name = method_file_A_renamed.split(args.pathA, 1)[1]
+                        if method_short_name not in boc_list:
+                            boc_list[method_short_name] = release
                             boc = release
                         else:
-                            boc = bocArray.get(method_short_name)
-                        if method_short_name not in fchArray:
-                            fchArray[method_short_name] = 0
+                            boc = boc_list.get(method_short_name)
+                        if method_short_name not in fch_list:
+                            fch_list[method_short_name] = 0
                         if method_short_name not in frchArray:
                             frchArray[method_short_name] = 0
                         if method_short_name not in wcdArray:
@@ -176,8 +185,8 @@ if __name__ == "__main__":
 
 
                         # get all commits from release n-1 to n, the goal is to find the total amount of changes on a file
-                        commits_touching_path = Repository(args.pathA, from_commit=hashPrevious,
-                                                           to_commit=hashCurrent).traverse_commits()
+                        commits_touching_path = Repository(args.pathA, from_commit=hash_previous,
+                                                           to_commit=hash_current).traverse_commits()
                         # file_temp = method_short_name.replace(
                         #     absolutePath + args.pathA + args.project_name + "/", '')
                         added_lines = 0
@@ -185,22 +194,78 @@ if __name__ == "__main__":
                         loc = 0
                         previous_commit = None
                         for current_commit in commits_touching_path:
+                            path_A.checkout(current_commit.hash)
+                            if previous_commit:
+                                path_B.checkout(previous_commit.hash)
                             if not previous_commit:
                                 # first commit
                                 previous_commit = current_commit
                             else:
-                                pathB.checkout(previous_commit.hash)
-                            current_modified_files = [x for x in current_commit.modified_files if x.filename.endswith('.java')]
-                            # previous_files = pathB.files()
-                            for modified_file in current_modified_files:
-                                print(modified_file.filename)
-                                if modified_file.new_path:
-                                    print('new: ' + modified_file.new_path)
-                                if modified_file.old_path:
-                                    print('old: ' + modified_file.old_path)
-                                else:
-                                    print('old: None')
-                                print('-------------')
+                                current_modified_files = [x for x in current_commit.modified_files if x.filename.endswith('.java')]
+                                # previous_files = pathB.files()
+
+                                for modified_file in current_modified_files:
+                                    # print(modified_file.filename)
+
+                                    if modified_file.new_path and modified_file.old_path:
+                                        print(modified_file.new_path + ' ' + modified_file.old_path)
+
+
+
+                                        commit_methods_path_A = 'results/' + current_commit.hash + modified_file.new_path
+                                        commit_method_files_A = read_method_files(current_commit.hash, modified_file.new_path, commit_methods_path_A)
+
+                                        commit_methods_path_B = 'results/' + previous_commit.hash + modified_file.old_path
+                                        commit_method_files_B = read_method_files(previous_commit.hash, modified_file.old_path, commit_methods_path_B)
+
+                                        result = filecmp.dircmp(methods_path_A, commit_methods_path_B)
+                                        print(result.report())
+
+                                        #new methods
+                                        for new_method in result.left_only:
+                                            print(new_method)
+                                            try:
+                                                with open(commit_methods_path_A + '/' + new_method, 'r') as fp:
+                                                    lines = len(fp.readlines())
+                                                    commit_method_file_A_renamed = commit_methods_path_A + '/' + new_method
+                                                    commit_method_short_name = \
+                                                    commit_method_file_A_renamed.split(args.pathA, 1)[1]
+                                                    csbsArray[method_short_name] = lines
+                                            except:
+                                                print(new_method)
+                                                print(sys.exc_info())
+                                        #modified methods
+                                        for modified_method in result.diff_files:
+                                            print(modified_method)
+
+                                        # 'results/' + hash_current + file
+                                    # elif modified_file.old_path:
+                                    #     print('old: ' + modified_file.old_path)
+                                    elif modified_file.new_path:
+                                        # print('new: ' + modified_file.new_path)
+                                        current_commit_hash = current_commit.hash
+                                        current_commit_path = str(path_A.path) + '/' + str(modified_file.new_path)
+                                        commit_methods_path_A = 'results/' + current_commit.hash + str(path_A.path) + '/' + modified_file.new_path
+
+                                        commit_method_files_A = read_method_files(current_commit_hash, current_commit_path, commit_methods_path_A)
+
+
+                                        # commit_method_files_A = read_method_files(current_commit.hash, modified_file.new_path,
+                                        #                                    commit_methods_path_A)
+                                        if commit_method_files_A:
+                                            for commit_method_file_A in commit_method_files_A:
+                                                try:
+                                                    with open(commit_methods_path_A + '/' + commit_method_file_A, 'r') as fp:
+                                                        lines = len(fp.readlines())
+                                                        commit_method_file_A_renamed = commit_methods_path_A + '/' + commit_method_file_A
+                                                        commit_method_short_name = commit_method_file_A_renamed.split(args.pathA, 1)[1]
+                                                        csbsArray[method_short_name] = lines
+                                                except:
+                                                    print(commit_method_file_A)
+                                                    print(sys.exc_info())
+
+                                #     print('old: None')
+                                # print('-------------')
                                 # count_metrics_between_releases(modified_file.new_path, modified_file.old_path, pathA, pathB )
                                 # if (modified_file.change_type.name == 'ADD' and (
                                 #         modified_file.new_path == modified_file or modified_file.old_path == modified_file)):
@@ -255,7 +320,7 @@ if __name__ == "__main__":
                         if (csb > 0):
                             csbs = csbsArray[method_short_name] / csb
 
-                        row = [args.project_name, hashCurrent, hashPrevious, method_short_name, release, boc,
+                        row = [args.project_name, hash_current, hash_previous, method_short_name, release, boc,
                                tach, fch, lch, cho, frch,
                                chd, wch, wfr, ataf, lca, lcd, csb, csbs, acdf]
                         writer.writerow(row)
