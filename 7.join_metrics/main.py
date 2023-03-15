@@ -1,17 +1,15 @@
-from asyncore import write
-from importlib.resources import path
+
 import pydriller
 import argparse
-from csv import reader
-import csv
-from pydriller import Repository
 import git
 import pandas as pd
 import numpy as np
 
 from ck import join_ck
 from understand import join_understand
+from evo import join_evo
 from change_distiller import join_change_distiller
+from smells import join_smells
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description='Join Metrics')
@@ -25,20 +23,8 @@ if __name__ == "__main__":
         tags = repo.tags
         release = 1
 
-        csvOrganic = "/Volumes/backup-geni/projects-smells/results/organic/junit4.csv"
-        csvResults = "/Volumes/backup-geni/projects-smells/results/junit4-all-releases.csv"
+        csv_results = 'results/' + project_name + '-all-releases.csv'
 
-        organicMetrics = ["projectName", "commitNumber", "fullyQualifiedName",
-                          "PublicFieldCount", "IsAbstract", "ClassLinesOfCode", "WeighOfClass",
-                          "FANIN", "TightClassCohesion", "FANOUT", "OverrideRatio", "LCOM3",
-                          "WeightedMethodCount", "LCOM2", "NumberOfAccessorMethods",
-                          'LazyClass', 'DataClass', 'ComplexClass', 'SpaghettiCode',
-                          'SpeculativeGenerality', 'GodClass', 'RefusedBequest',
-                          'ClassDataShouldBePrivate', 'BrainClass', 'TotalClass',
-                          'LongParameterList', 'LongMethod', 'FeatureEnvy',
-                          'DispersedCoupling', 'MessageChain', 'IntensiveCoupling',
-                          'ShotgunSurgery', 'BrainMethod', 'TotalMethod', 'TotalClassMethod',
-                          "DiversityTotal", "DiversityMethod", "DiversityClass"]
         # f = open(csvPath, "w")
         # writer = csv.writer(f)
         missing = []
@@ -46,30 +32,22 @@ if __name__ == "__main__":
             current_hash = gr.get_commit_from_tag(tag.name).hash
 
             try:
-                releaseOrganicMetrics = pd.read_csv(csvOrganic, usecols=organicMetrics, sep=',', engine='python',
-                                                    index_col=False)
-                releaseOrganicMetrics = releaseOrganicMetrics[(releaseOrganicMetrics['commitNumber'] == current_hash)]
+                ck = join_ck(project_name, current_hash)
+                und = join_understand(project_name, current_hash)
+                df_joined = pd.merge(left=ck, right=und, left_on='class', right_on='Name')
 
-                print("Organic ")
-                print(releaseOrganicMetrics.shape[0])
+                evo = join_evo(project_name, current_hash)
+                df_joined = pd.merge(left=df_joined, right=evo, left_on='class', right_on='className')
 
-                releaseCK = join_ck(project_name, current_hash)
-                releaseUnderstand = join_understand(project_name, current_hash)
-                df_joined = pd.merge(left=releaseCK, right=releaseUnderstand, left_on='class', right_on='Name')
-
-
-                # df_joined = pd.merge(left=df_joined, right=releaseProcessMetrics, left_on='class',
-                #                                  right_on='className')
-                # df_joined = pd.merge(left=df_joined, right=releaseOrganicMetrics,
-                #                                          left_on='class', right_on='fullyQualifiedName')
+                smells = join_smells(project_name, current_hash)
+                df_joined = pd.merge(left=df_joined, right=smells, left_on='class', right_on='fullyQualifiedName')
 
                 # merged_full = pd.merge(left=ck_understand_process_organic, right=releaseChangeDistillerMetrics,
                 #                        left_on='class', right_on='CLASS_PREVIOUSCOMMIT')
 
-                release_change_distiller = join_change_distiller(project_name, current_hash)
-                df_joined = pd.merge(left=df_joined, right=release_change_distiller,
+                change_distiller = join_change_distiller(project_name, current_hash)
+                df_joined = pd.merge(left=df_joined, right=change_distiller,
                                      left_on='class', right_on='CLASS_PREVIOUSCOMMIT')
-                df_joined = join_change_distiller(project_name, current_hash, df_joined)
 
                 # df_joined.loc[:,'class_frequency'] = 1
                 df_joined.loc[:, 'will_change'] = 0
@@ -77,7 +55,7 @@ if __name__ == "__main__":
                 df_joined.loc[:, 'release'] = release
                 medianChanges = df_joined['TOTAL_CHANGES'].median()
                 df_joined['will_change'] = np.where(df_joined['TOTAL_CHANGES'] > medianChanges, 1, 0)
-                if (release == 1):
+                if release == 1:
                     df_joined.to_csv(csvResults, index=False)
                 else:
                     df_joined.to_csv(csvResults, mode="a", header=False, index=False)
