@@ -56,9 +56,9 @@ if __name__ == "__main__":
                 medianChanges = df_joined['TOTAL_CHANGES'].median()
                 df_joined['will_change'] = np.where(df_joined['TOTAL_CHANGES'] > medianChanges, 1, 0)
                 if release == 1:
-                    df_joined.to_csv(csvResults, index=False)
+                    df_joined.to_csv(csv_results, index=False)
                 else:
-                    df_joined.to_csv(csvResults, mode="a", header=False, index=False)
+                    df_joined.to_csv(csv_results, mode="a", header=False, index=False)
 
                 release += 1
             except Exception as e:
