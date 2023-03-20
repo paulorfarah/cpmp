@@ -167,10 +167,12 @@ if __name__ == "__main__":
 
         if release == 1:
             # commit_A = tag
+            print('prev: None')
+            print('curr: ' + current_release)
+
             previous_release = current_release
             header = ['project', 'commit', 'commitprevious', 'release', 'file', 'method', 'BOC', 'TACH', 'FCH', 'LCH',
-                      'CHO',
-                      'FRCH', 'CHD', 'WCD', 'WFR', 'ATAF', 'LCA', 'LCD', 'CSB', 'CSBS', 'ACDF']
+                      'CHO', 'FRCH', 'CHD', 'WCD', 'WFR', 'ATAF', 'LCA', 'LCD', 'CSB', 'CSBS', 'ACDF']
             writer.writerow(header)
 
             # Birth of the first methods (BOM)
@@ -190,7 +192,7 @@ if __name__ == "__main__":
                             writer.writerow(row)
         else:
             # release > 1
-
+            print('prev: ' + previous_release)
             boc = release
             tach = 0
             fch = 0
@@ -251,6 +253,7 @@ if __name__ == "__main__":
                         loc = 0
                         previous_commit = None
                         for current_commit in commits_between_releases:
+                            print('comm: ' + current_commit)
                             path_A.checkout(current_commit.hash)
 
                             if not previous_commit:
@@ -312,11 +315,11 @@ if __name__ == "__main__":
                                                 cur_method_file = lf.readlines()
                                                 with open(result.right + '/' + modified_method) as lr:
                                                     prev_method_file = lr.readlines()
-                                                    for l in prev_method_file:
-                                                        print(l)
-                                                    print('=======================')
-                                                    for l in cur_method_file:
-                                                        print(l)
+                                                    # for l in prev_method_file:
+                                                    #     print(l)
+                                                    # print('=======================')
+                                                    # for l in cur_method_file:
+                                                    #     print(l)
                                                     diff = myers.diff(prev_method_file, cur_method_file)
                                                     for d in diff:
                                                         if d[0] == 'i':
@@ -350,6 +353,7 @@ if __name__ == "__main__":
 
                                     # elif modified_file.old_path:
                                     #     print('old: ' + modified_file.old_path)
+                            previous_commit = current_commit
 
                         # total amount change, added lines + deleted lines (changed lines are already counted twice )
                         tach = added_lines + deleted_lines
