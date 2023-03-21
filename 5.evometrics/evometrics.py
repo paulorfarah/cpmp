@@ -104,7 +104,7 @@ if __name__ == "__main__":
                         method_short_name = method_file_A.split(args.pathA, 1)[1].replace('.java', '')
                         if method_short_name not in boc_list:
                             boc_list[method_short_name] = release
-                            fch_list[method_short_name] = 0
+                            # fch_list[method_short_name] = 0
                             row = [args.project_name, current_release, '', release, file, method_short_name, release, 0,
                                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                             writer.writerow(row)
@@ -245,8 +245,7 @@ if __name__ == "__main__":
                                             if fch_list[method_short_name] == 0:
                                                 fch_list[method_short_name] = release
                                                 fch = release
-                                            else:
-                                                fch = fch_list[method_short_name]
+
                                             # last time change, the lastest released analayzed
                                             lhc = release
                                             # if changes have occurred
@@ -299,6 +298,7 @@ if __name__ == "__main__":
                         lcd = lcdArray[method_short_name]
                         csb = csbArray[method_short_name]
                         cho = cho_list[method_short_name]
+                        fch = fch_list[method_short_name]
                         if (csb > 0):
                             csbs = csbsArray[method_short_name] / csb
 
