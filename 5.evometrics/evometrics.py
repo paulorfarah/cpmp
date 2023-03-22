@@ -41,6 +41,7 @@ def read_nloc(commit_methods_path_A, commit_method_file_A):
         print(sys.exc_info())
     return nloc
 
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description='Extract process metrics')
     ap.add_argument('--pathA', required=True)
@@ -64,6 +65,9 @@ if __name__ == "__main__":
     boc_list = {}
     fch_list = {}
     lch_list = {}
+    tach_list = {}
+    chd_list = {}
+
     frchArray = {}
     wcdArray = {}
     wfrArray = {}
@@ -89,9 +93,8 @@ if __name__ == "__main__":
             print('prev: None')
             print('curr: ' + current_release)
 
-
             header = ['project', 'commit', 'commitprevious', 'release', 'file', 'method', 'BOC', 'TACH', 'FCH', 'LCH',
-                      'CHO', 'FRCH', 'CHD', 'WCD', 'WFR', 'ATAF', 'LCA', 'LCD', 'CSB', 'CSBS', 'ACDF']
+                      'CHO', 'FRCH', 'CHD', 'WCH', 'WCD', 'WFR', 'ATAF', 'LCA', 'LCD', 'CSB', 'CSBS', 'ACDF']
             writer.writerow(header)
 
             # Birth of the first methods (BOM)
@@ -107,7 +110,7 @@ if __name__ == "__main__":
                             boc_list[method_short_name] = release
                             # fch_list[method_short_name] = 0
                             row = [args.project_name, current_release, '', release, file, method_short_name, release, 0,
-                                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                             writer.writerow(row)
         else:
             # release > 1
@@ -119,6 +122,7 @@ if __name__ == "__main__":
             cho = 0
             frch = 0
             chd = 0
+            wch = 0
             wcd = 0
             wfr = 0
             ataf = 0
@@ -167,6 +171,10 @@ if __name__ == "__main__":
                             acdfArray[method_short_name] = 0
                         if method_short_name not in cho_list:
                             cho_list[method_short_name] = 0
+                        if method_short_name not in tach_list:
+                            tach_list[method_short_name] = []
+                        if method_short_name not in chd_list:
+                            chd_list[method_short_name] = []
 
                         # work with modified methods
                         commits_between_releases = Repository(args.pathA, from_commit=previous_release,
@@ -177,7 +185,6 @@ if __name__ == "__main__":
                         previous_commit = None
                         for current_commit in commits_between_releases:
                             print('comm: ' + current_commit.hash)
-
 
                             if not previous_commit:
                                 # first commit
@@ -221,7 +228,8 @@ if __name__ == "__main__":
                                             nloc = read_nloc(commit_methods_path_A, new_method)
                                             commit_method_file_A_renamed = commit_methods_path_A + '/' + new_method
                                             commit_method_short_name = \
-                                            commit_method_file_A_renamed.split(args.pathA, 1)[1].replace('.java', '')
+                                                commit_method_file_A_renamed.split(args.pathA, 1)[1].replace('.java',
+                                                                                                             '')
                                             csbsArray[commit_method_short_name] = nloc
 
                                         # modified methods
@@ -265,7 +273,8 @@ if __name__ == "__main__":
                                                 nloc = read_nloc(commit_methods_path_A, commit_method_file_A)
                                                 commit_method_file_A_renamed = commit_methods_path_A + '/' + commit_method_file_A
                                                 commit_method_short_name = \
-                                                commit_method_file_A_renamed.split(args.pathA, 1)[1].replace('.java', '')
+                                                    commit_method_file_A_renamed.split(args.pathA, 1)[1].replace(
+                                                        '.java', '')
                                                 csbsArray[commit_method_short_name] = nloc
 
                                     # elif modified_file.old_path:
@@ -274,9 +283,11 @@ if __name__ == "__main__":
 
                         # total amount change, added lines + deleted lines (changed lines are already counted twice )
                         tach = added_lines + deleted_lines
+                        tach_list[method_short_name].append(tach)
                         if tach > 0:
                             chd = tach / loc
                             # cumulative weight of change
+                            # wcdArray[method_short_name] += tach * pow(2, boc - release)
                             wcdArray[method_short_name] += tach * pow(2, boc - release)
                             # sum of change density, to normalize later
                             acdfArray[method_short_name] += chd
@@ -294,9 +305,21 @@ if __name__ == "__main__":
                         else:
                             chd = 0
                             wcdArray[method_short_name] += 0
-                        wcd = wcdArray[method_short_name]
-                        wch = wcd * pow(2, boc - release)
-                        # cumultive weight frequecy
+
+                        wch = 0
+                        n = release
+                        for j in range(boc, n):
+                            r = j + 1
+                            wch += tach_list[method_short_name][j - 1] * pow(2, r - n)
+
+                        # wcd = wcdArray[method_short_name]
+                        chd_list[method_short_name].append(chd)
+                        wcd = 0
+                        for j in range(boc, n):
+                            r = j + 1
+                            wcd += chd_list[method_short_name][j - 1] * pow(2, r - n)
+
+                        # cumulative weight frequency
                         wfrArray[method_short_name] += (release - 1) * cho_list[method_short_name]
                         wfr = wfrArray[method_short_name]
                         lca = lcaArray[method_short_name]
@@ -305,12 +328,12 @@ if __name__ == "__main__":
                         cho = cho_list[method_short_name]
                         fch = fch_list[method_short_name]
                         lch = lch_list[method_short_name]
-                        if (csb > 0):
-                            csbs = csbsArray[method_short_name] / csb
-
-                        row = [args.project_name, current_release, previous_release, release, file, method_short_name, boc,
-                               tach, fch, lch, cho, frch,
-                               chd, wch, wfr, ataf, lca, lcd, csb, csbs, acdf]
+                        if csb > 0:
+                            # csbs = csbsArray[method_short_name] / csb
+                            csbs = csb / csbsArray[method_short_name]
+                        row = [args.project_name, current_release, previous_release, release, file, method_short_name,
+                               boc,
+                               tach, fch, lch, cho, frch, chd, wch, wcd, wfr, ataf, lca, lcd, csb, csbs, acdf]
                         writer.writerow(row)
         print('curr: ' + current_release)
         print('--------')
