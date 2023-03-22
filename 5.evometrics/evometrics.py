@@ -63,6 +63,7 @@ if __name__ == "__main__":
     commit_A = ''
     boc_list = {}
     fch_list = {}
+    lch_list = {}
     frchArray = {}
     wcdArray = {}
     wfrArray = {}
@@ -114,7 +115,7 @@ if __name__ == "__main__":
             boc = release
             tach = 0
             fch = 0
-            lch = release
+            # lch = release
             cho = 0
             frch = 0
             chd = 0
@@ -247,7 +248,8 @@ if __name__ == "__main__":
                                                 fch = release
 
                                             # last time change, the lastest released analayzed
-                                            lhc = release
+                                            # lch = release
+                                            lch_list[method_short_name] = release
                                             # if changes have occurred
                                             cho_list[method_short_name] = 1
                                             # frequency of change
@@ -289,6 +291,9 @@ if __name__ == "__main__":
                             lcdArray[method_short_name] = chd
                             csbArray[method_short_name] += tach
 
+                        else:
+                            chd = 0
+                            wcdArray[method_short_name] += 0
                         wcd = wcdArray[method_short_name]
                         wch = wcd * pow(2, boc - release)
                         # cumultive weight frequecy
@@ -299,6 +304,7 @@ if __name__ == "__main__":
                         csb = csbArray[method_short_name]
                         cho = cho_list[method_short_name]
                         fch = fch_list[method_short_name]
+                        lch = lch_list[method_short_name]
                         if (csb > 0):
                             csbs = csbsArray[method_short_name] / csb
 
