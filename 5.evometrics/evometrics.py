@@ -90,8 +90,8 @@ if __name__ == "__main__":
 
         if release == 1:
             # commit_A = tag
-            print('prev: None')
-            print('curr: ' + current_release)
+            # print('prev: None')
+            # print('curr: ' + current_release)
 
             header = ['project', 'commit', 'commitprevious', 'release', 'file', 'method', 'BOC', 'TACH', 'FCH', 'LCH',
                       'CHO', 'FRCH', 'CHD', 'WCH', 'WCD', 'WFR', 'ATAF', 'LCA', 'LCD', 'CSB', 'CSBS', 'ACDF']
@@ -116,11 +116,11 @@ if __name__ == "__main__":
                             writer.writerow(row)
         else:
             # release > 1
-            print('prev: ' + previous_release)
+            # print('prev: ' + previous_release)
             boc = release
             tach = 0
             fch = 0
-            # lch = release
+            lch = 0
             cho = 0
             frch = 0
             chd = 0
@@ -178,6 +178,8 @@ if __name__ == "__main__":
                             tach_list[method_short_name] = []
                         if method_short_name not in chd_list:
                             chd_list[method_short_name] = []
+                        if method_short_name not in lch_list:
+                            lch_list[method_short_name] = 0
 
                         # work with modified methods
                         commits_between_releases = Repository(args.pathA, from_commit=previous_release,
@@ -187,7 +189,7 @@ if __name__ == "__main__":
                         loc = 0
                         previous_commit = None
                         for current_commit in commits_between_releases:
-                            print('comm: ' + current_commit.hash)
+                            # print('comm: ' + current_commit.hash)
 
                             if not previous_commit:
                                 # first commit
@@ -260,6 +262,7 @@ if __name__ == "__main__":
 
                                             # last time change, the lastest released analayzed
                                             # lch = release
+
                                             lch_list[method_short_name] = release
                                             # if changes have occurred
                                             cho_list[method_short_name] = 1
@@ -348,8 +351,8 @@ if __name__ == "__main__":
                                boc,
                                tach, fch, lch, cho, frch, chd, wch, wcd, wfr, ataf, lca, lcd, csb, csbs, acdf]
                         writer.writerow(row)
-        print('curr: ' + current_release)
-        print('--------')
+        # print('curr: ' + current_release)
+        # print('--------')
         previous_release = current_release
         commit_A = tag
         release += 1
