@@ -108,7 +108,9 @@ if __name__ == "__main__":
                         method_short_name = method_file_A.split(args.pathA, 1)[1].replace('.java', '')
                         if method_short_name not in boc_list:
                             boc_list[method_short_name] = release
-                            # fch_list[method_short_name] = 0
+                            nloc = read_nloc(methods_path_A, method_file)
+                            csbsArray[method_short_name] = nloc
+
                             row = [args.project_name, current_release, '', release, file, method_short_name, release, 0,
                                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                             writer.writerow(row)
@@ -166,7 +168,8 @@ if __name__ == "__main__":
                         if method_short_name not in csbArray:
                             csbArray[method_short_name] = 0
                         if method_short_name not in csbsArray:
-                            csbsArray[method_short_name] = 0
+                            nloc = read_nloc(methods_path_A, method_file)
+                            csbsArray[method_short_name] = nloc
                         if method_short_name not in acdfArray:
                             acdfArray[method_short_name] = 0
                         if method_short_name not in cho_list:
@@ -287,25 +290,34 @@ if __name__ == "__main__":
                         if tach > 0:
                             chd = tach / loc
                             # cumulative weight of change
-                            # wcdArray[method_short_name] += tach * pow(2, boc - release)
                             wcdArray[method_short_name] += tach * pow(2, boc - release)
                             # sum of change density, to normalize later
-                            acdfArray[method_short_name] += chd
+                            # acdfArray[method_short_name] += chd
                             # agregate change size, normalized by frequency change
                             if frch > 0:
                                 ataf = tach / frch
                                 # agregate change density normalized by frch
-                                acdf = acdfArray[method_short_name] / frch
+                                # acdf = acdfArray[method_short_name] / frch
+                            # else:
+                            #     acdf = 0
+
                             # last amount of change
                             lcaArray[method_short_name] = tach
                             # last change density
                             lcdArray[method_short_name] = chd
                             csbArray[method_short_name] += tach
-
                         else:
                             chd = 0
                             wcdArray[method_short_name] += 0
 
+                        # sum of change density, to normalize later
+                        acdfArray[method_short_name] += chd
+                        # agregate change size, normalized by frequency change
+                        if frch > 0:
+                            # agregate change density normalized by frch
+                            acdf = acdfArray[method_short_name] / frch
+                        else:
+                            acdf = 0
                         wch = 0
                         n = release
                         for j in range(boc, n):
@@ -328,9 +340,10 @@ if __name__ == "__main__":
                         cho = cho_list[method_short_name]
                         fch = fch_list[method_short_name]
                         lch = lch_list[method_short_name]
-                        if csb > 0:
-                            # csbs = csbsArray[method_short_name] / csb
+                        if csb > 0 and csbsArray[method_short_name] > 0:
                             csbs = csb / csbsArray[method_short_name]
+                        else:
+                            csbs = 0
                         row = [args.project_name, current_release, previous_release, release, file, method_short_name,
                                boc,
                                tach, fch, lch, cho, frch, chd, wch, wcd, wfr, ataf, lca, lcd, csb, csbs, acdf]
