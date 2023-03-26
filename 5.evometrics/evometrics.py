@@ -321,15 +321,18 @@ if __name__ == "__main__":
                             acdf = acdfArray[method_short_name] / frch
                         else:
                             acdf = 0
+
                         wch = 0
-                        n = release
+                        n = min(release, len(tach_list))
                         for j in range(boc, n):
                             r = j + 1
                             wch += tach_list[method_short_name][j - 1] * pow(2, r - n)
 
-                        # wcd = wcdArray[method_short_name]
+
                         chd_list[method_short_name].append(chd)
+
                         wcd = 0
+                        n = min(release, len(chd_list))
                         for j in range(boc, n):
                             r = j + 1
                             try:
