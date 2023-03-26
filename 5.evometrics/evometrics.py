@@ -332,7 +332,15 @@ if __name__ == "__main__":
                         wcd = 0
                         for j in range(boc, n):
                             r = j + 1
-                            wcd += chd_list[method_short_name][j - 1] * pow(2, r - n)
+                            try:
+                                wcd += chd_list[method_short_name][j - 1] * pow(2, r - n)
+                            except:
+                                print('chd_list, boc, n, j, r')
+                                print(chd_list)
+                                print(boc)
+                                print(n)
+                                print(j)
+                                print(r)
 
                         # cumulative weight frequency
                         wfrArray[method_short_name] += (release - 1) * cho_list[method_short_name]
