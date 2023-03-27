@@ -324,7 +324,7 @@ if __name__ == "__main__":
 
                         wch = 0
                         n = min(release, len(tach_list))
-                        for j in range(boc, n):
+                        for j in range(boc, n-1):
                             r = j + 1
                             wch += tach_list[method_short_name][j - 1] * pow(2, r - n)
 
@@ -333,7 +333,7 @@ if __name__ == "__main__":
 
                         wcd = 0
                         n = min(release, len(chd_list))
-                        for j in range(boc, n):
+                        for j in range(boc, n-1):
                             r = j + 1
                             try:
                                 wcd += chd_list[method_short_name][j - 1] * pow(2, r - n)
