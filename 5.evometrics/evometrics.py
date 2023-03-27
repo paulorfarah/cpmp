@@ -135,6 +135,9 @@ if __name__ == "__main__":
             acdf = 0
             # previous_release = path_A.get_commit_from_tag(commit_A.name).hash
 
+            commits_between_releases = Repository(args.pathA, from_commit=previous_release,
+                                                  to_commit=current_release).traverse_commits()
+
             # calculate the birth of methods
             for file in files:
                 file_short_name = file.split(args.pathA + '/', 1)[1]
@@ -175,15 +178,16 @@ if __name__ == "__main__":
                         if method_short_name not in cho_list:
                             cho_list[method_short_name] = 0
                         if method_short_name not in tach_list:
-                            tach_list[method_short_name] = []
+                            tach_list[method_short_name] = [0]
+                        else:
+                            tach_list[method_short_name].append(0)
                         if method_short_name not in chd_list:
                             chd_list[method_short_name] = []
                         if method_short_name not in lch_list:
                             lch_list[method_short_name] = 0
 
                         # work with modified methods
-                        commits_between_releases = Repository(args.pathA, from_commit=previous_release,
-                                                              to_commit=current_release).traverse_commits()
+
                         added_lines = 0
                         deleted_lines = 0
                         loc = 0
@@ -200,8 +204,8 @@ if __name__ == "__main__":
                                 path_B.checkout(previous_commit.hash)
 
                                 # modified_files = [x for x in current_commit.modified_files if x.filename.endswith('.java')]
-                                modified_files = [x for x in current_commit.modified_files if
-                                                  x.new_path == file_short_name or x.old_path == file_short_name]
+                                modified_files = [x for x in current_commit.modified_files if x.filename.endswith('.java') and
+                                                  (x.new_path == file_short_name or x.old_path == file_short_name)]
                                 # previous_files = pathB.files()
 
                                 for modified_file in modified_files:
@@ -289,7 +293,7 @@ if __name__ == "__main__":
 
                         # total amount change, added lines + deleted lines (changed lines are already counted twice )
                         tach = added_lines + deleted_lines
-                        tach_list[method_short_name].append(tach)
+                        tach_list[method_short_name][-1] = tach
                         if tach > 0:
                             chd = tach / loc
                             # cumulative weight of change
@@ -323,27 +327,22 @@ if __name__ == "__main__":
                             acdf = 0
 
                         wch = 0
-                        n = min(release, len(tach_list))
-                        for j in range(boc, n-1):
+                        i = 0
+                        n = release
+                        for j in range(boc, n):
                             r = j + 1
-                            wch += tach_list[method_short_name][j - 1] * pow(2, r - n)
-
+                            tach_r = tach_list[method_short_name][i]
+                            wch += tach_r * pow(2, r - n)
+                            i += 1
 
                         chd_list[method_short_name].append(chd)
 
                         wcd = 0
-                        n = min(release, len(chd_list))
-                        for j in range(boc, n-1):
+                        i = 0
+                        for j in range(boc, n):
                             r = j + 1
-                            # try:
-                            wcd += chd_list[method_short_name][j - 1] * pow(2, r - n)
-                            # except:
-                            #     print('chd_list, boc, n, j, r')
-                            #     print(chd_list)
-                            #     print(boc)
-                            #     print(n)
-                            #     print(j)
-                            #     print(r)
+                            chd_r = chd_list[method_short_name][i]
+                            wcd += chd_r * pow(2, r - n)
 
                         # cumulative weight frequency
                         wfrArray[method_short_name] += (release - 1) * cho_list[method_short_name]
