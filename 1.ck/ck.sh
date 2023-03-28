@@ -15,7 +15,8 @@ git clone "$REPO" "$PROJECT_NAME"
 while read commit; do
 # reading each commit 
 echo "$commit"
-cd "${PROJECT_NAME}" 
+cd "${PROJECT_NAME}"
+git fetch
 git checkout $commit
 cd .. 
 java -jar ck-0.7.1-SNAPSHOT-jar-with-dependencies.jar "${PROJECT_NAME}" true 0 false ./

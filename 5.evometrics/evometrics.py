@@ -210,8 +210,11 @@ if __name__ == "__main__":
                                 path_B.checkout(previous_commit.hash)
 
                                 # modified_files = [x for x in current_commit.modified_files if x.filename.endswith('.java')]
-                                modified_files = [x for x in current_commit.modified_files if x.filename.endswith('.java') and
+                                try:
+                                    modified_files = [x for x in current_commit.modified_files if x.filename.endswith('.java') and
                                                   (x.new_path == file_short_name or x.old_path == file_short_name)]
+                                except ValueError:
+                                    modified_files = []
                                 # previous_files = pathB.files()
 
                                 for modified_file in modified_files:
@@ -337,7 +340,10 @@ if __name__ == "__main__":
                         n = release
                         for j in range(boc, n):
                             r = j + 1
-                            tach_r = tach_list[method_short_name][i]
+                            try:
+                                tach_r = tach_list[method_short_name][i]
+                            except:
+                                print(boc)
                             wch += tach_r * pow(2, r - n)
                             i += 1
 
