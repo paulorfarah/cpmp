@@ -153,9 +153,9 @@ if __name__ == "__main__":
                         method_file_A = methods_path_A + '/' + method_file
                         method_short_name = method_file_A.split(args.pathA, 1)[1].replace('.java', '')
 
-                        if method_short_name == '/src/test/resources/Java8Example/hello()':
-                            print(release)
-                            print(current_release)
+                        # if method_short_name == '/src/test/resources/Java8Example/hello()':
+                            # print(release)
+                            # print(current_release)
 
                         if method_short_name not in boc_list:
                             boc = release
@@ -337,14 +337,7 @@ if __name__ == "__main__":
                         n = release
                         for j in range(boc, n):
                             r = j + 1
-                            try:
-                                tach_r = tach_list[method_short_name][i]
-                            except:
-                                print(method_short_name)
-                                print(tach_list[method_short_name])
-                                print(i)
-                                print(r)
-
+                            tach_r = tach_list[method_short_name][i]
                             wch += tach_r * pow(2, r - n)
                             i += 1
 
@@ -356,6 +349,7 @@ if __name__ == "__main__":
                             r = j + 1
                             chd_r = chd_list[method_short_name][i]
                             wcd += chd_r * pow(2, r - n)
+                            i += 1
 
                         # cumulative weight frequency
                         wfrArray[method_short_name] += (release - 1) * cho_list[method_short_name]
@@ -377,13 +371,11 @@ if __name__ == "__main__":
 
             # put 0 in methods that not changed
             for k, v in tach_list.items():
-                num_items = boc_list[k] + len(tach_list[k])
-                if num_items < release-1:
+                if len(tach_list[k]) < release - boc_list[k]:
                     tach_list[k].append(0)
 
             for k, v in chd_list.items():
-                num_items = boc_list[k] + len(chd_list[k])
-                if num_items < release - 1:
+                if len(chd_list[k]) < release - boc_list[k]:
                     chd_list[k].append(0)
 
         # print('curr: ' + current_release)
