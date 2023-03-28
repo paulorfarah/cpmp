@@ -23,9 +23,10 @@ def read_method_files(hash, file, methods_path):
     try:
         method_files = [mf for mf in listdir(methods_path) if isfile(join(methods_path, mf))]
     except FileNotFoundError:
-        print('[>>>FileNotFound]: Check if class has methods:')
-        if methods_path:
-            print(methods_path)
+        pass
+        # print('[>>>FileNotFound]: Check if class has methods:')
+        # if methods_path:
+        #     print(methods_path)
     except:
         print('[>>>Error]: extracting methods: ' + str(sys.exc_info()))
     return method_files
@@ -37,7 +38,7 @@ def read_nloc(commit_methods_path_A, commit_method_file_A):
         with open(commit_methods_path_A + '/' + commit_method_file_A, 'r') as cmp:
             nloc = len(cmp.readlines())
     except:
-        print(commit_method_file_A)
+        print('Error reading nloc: ' + commit_method_file_A)
         print(sys.exc_info())
     return nloc
 
@@ -84,6 +85,7 @@ if __name__ == "__main__":
     previous_release = None
     for tag in tags:
         current_release = path_A.get_commit_from_tag(tag.name).hash
+        print(current_release, tag.name)
         path_A.checkout(current_release)
         files = path_A.files()
         files = [x for x in files if x.endswith('.java')]
@@ -150,6 +152,10 @@ if __name__ == "__main__":
                     for method_file in method_files_A:
                         method_file_A = methods_path_A + '/' + method_file
                         method_short_name = method_file_A.split(args.pathA, 1)[1].replace('.java', '')
+
+                        if method_short_name == '/src/test/resources/Java8Example/hello()':
+                            print(release)
+                            print(current_release)
 
                         if method_short_name not in boc_list:
                             boc = release
@@ -331,7 +337,14 @@ if __name__ == "__main__":
                         n = release
                         for j in range(boc, n):
                             r = j + 1
-                            tach_r = tach_list[method_short_name][i]
+                            try:
+                                tach_r = tach_list[method_short_name][i]
+                            except:
+                                print(method_short_name)
+                                print(tach_list[method_short_name])
+                                print(i)
+                                print(r)
+
                             wch += tach_r * pow(2, r - n)
                             i += 1
 
@@ -361,6 +374,18 @@ if __name__ == "__main__":
                                boc,
                                tach, fch, lch, cho, frch, chd, wch, wcd, wfr, ataf, lca, lcd, csb, csbs, acdf]
                         writer.writerow(row)
+
+            # put 0 in methods that not changed
+            for k, v in tach_list.iteritems():
+                num_items = boc_list[k] + len(tach_list[k])
+                if num_items < release-1:
+                    tach_list[k].append(0)
+
+            for k, v in chd_list.iteritems():
+                num_items = boc_list[k] + len(chd_list[k])
+                if num_items < release - 1:
+                    chd_list[k].append(0)
+
         # print('curr: ' + current_release)
         # print('--------')
         previous_release = current_release
