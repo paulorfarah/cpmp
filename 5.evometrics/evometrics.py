@@ -376,12 +376,12 @@ if __name__ == "__main__":
                         writer.writerow(row)
 
             # put 0 in methods that not changed
-            for k, v in tach_list.iteritems():
+            for k, v in tach_list.items():
                 num_items = boc_list[k] + len(tach_list[k])
                 if num_items < release-1:
                     tach_list[k].append(0)
 
-            for k, v in chd_list.iteritems():
+            for k, v in chd_list.items():
                 num_items = boc_list[k] + len(chd_list[k])
                 if num_items < release - 1:
                     chd_list[k].append(0)
