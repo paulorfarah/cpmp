@@ -23,6 +23,7 @@ def concat_method(row):
 
     # 'org.apache.bcel.generic.InstructionList.redirectExceptionHandlers(org.apache.bcel.generic.CodeExceptionGen[],org.apache.bcel.generic.InstructionHandle,org.apache.bcel.generic.InstructionHandle)'
 
+    method_name = method_name.replace('$', '.')
     return method_name
 
 
