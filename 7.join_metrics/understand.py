@@ -1,8 +1,8 @@
 import pandas as pd
 
 def join_understand(project_name, current_hash):
-    print("Understand ")
-    csv_path = '../2.understand/results/' + project_name + '-methods-results.csv'
+    # print("Understand ")
+    csv_path = '../2.understand/results/' + project_name + '/' + current_hash + '.csv'
 
     # understandRepo = pydriller.Git(csvPathUndestand)
     metrics = ["Kind", "Name", "File", "AvgCyclomatic", "AvgCyclomaticModified", "AvgCyclomaticStrict",
@@ -18,7 +18,11 @@ def join_understand(project_name, current_hash):
                          "MaxInheritanceTree", "MaxNesting", "PercentLackOfCohesion", "RatioCommentToCode",
                          "SumCyclomatic", "SumCyclomaticModified", "SumCyclomaticStrict", "SumEssential"]
 
-    df = pd.read_csv(csv_path + current_hash + '.csv', usecols=metrics, sep=',', engine='python', index_col=False)
+    df = pd.read_csv(csv_path, usecols=metrics, sep=',', engine='python', index_col=False)
+    df_methods = df[df['Kind'].str.contains("Method")]
+    df_constructors = df[df['Kind'].str.contains("Constructor")]
 
-    print(df.shape[0])
-    return df
+    df_filtered = pd.concat([df_methods, df_constructors])
+
+    # print(df_filtered.shape[0])
+    return df_filtered

@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     projects = ['commons-bcel']
     for project_name in projects:
-        repo_path = "../repos/" + project_name
+        repo_path = "repos/" + project_name
         gr = pydriller.Git(repo_path)
         repo = git.Repo(repo_path)
         tags = repo.tags
@@ -34,13 +34,15 @@ if __name__ == "__main__":
             try:
                 ck = join_ck(project_name, current_hash)
                 und = join_understand(project_name, current_hash)
-                df_joined = pd.merge(left=ck, right=und, left_on='class', right_on='Name')
+                df_joined = pd.merge(left=ck, right=und, left_on='method_name', right_on='Name', how='outer', indicator=True)
+
+                df_disjoint = df_joined.query('_merge != "both"')[['method_name', 'Name']]
 
                 evo = join_evo(project_name, current_hash)
                 df_joined = pd.merge(left=df_joined, right=evo, left_on='class', right_on='className')
 
-                smells = join_smells(project_name, current_hash)
-                df_joined = pd.merge(left=df_joined, right=smells, left_on='class', right_on='fullyQualifiedName')
+                # smells = join_smells(project_name, current_hash)
+                # df_joined = pd.merge(left=df_joined, right=smells, left_on='class', right_on='fullyQualifiedName')
 
                 # merged_full = pd.merge(left=ck_understand_process_organic, right=releaseChangeDistillerMetrics,
                 #                        left_on='class', right_on='CLASS_PREVIOUSCOMMIT')
