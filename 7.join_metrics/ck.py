@@ -28,9 +28,10 @@ def concat_method(row):
 
 
 def join_ck(project_name, current_hash):
-    # print("CK ")
-    csv_path = '../1.ck/results/' + project_name + '/' + project_name + '_' + current_hash + '_method.csv'
-
+    print("CK ")
+    # csv_path = '../1.ck/results/' + project_name + '/' + project_name + '_' + current_hash + '_method.csv'
+    csv_path = '/home/farah/PycharmProjects/cpmp/1.ck/results/' + project_name + '/' + project_name + '_' + current_hash + '_method.csv'
+    print(csv_path)
     method_metrics = ['file', 'class', 'method', 'constructor', 'line', 'cbo', 'cboModified', 'fanin', 'fanout', 'wmc',
                       'rfc', 'loc', 'returnsQty', 'variablesQty', 'parametersQty', 'methodsInvokedQty',
                       'methodsInvokedLocalQty', 'methodsInvokedIndirectLocalQty', 'loopQty', 'comparisonsQty',
