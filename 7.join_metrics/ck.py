@@ -21,16 +21,15 @@ def concat_method(row):
 
         method_name = re.sub('\([a-zA-Z0-9\._,\[\]]+\)$', '(' + ','.join(params) + ')', method_name)
 
-    # 'org.apache.bcel.generic.InstructionList.redirectExceptionHandlers(org.apache.bcel.generic.CodeExceptionGen[],org.apache.bcel.generic.InstructionHandle,org.apache.bcel.generic.InstructionHandle)'
 
     method_name = method_name.replace('$', '.')
     return method_name
 
 
 def join_ck(project_name, current_hash):
-    print("CK ")
+    # print("CK ")
     # csv_path = '../1.ck/results/' + project_name + '/' + project_name + '_' + current_hash + '_method.csv'
-    csv_path = '/home/farah/PycharmProjects/cpmp/1.ck/results/' + project_name + '/' + project_name + '_' + current_hash + '_method.csv'
+    csv_path = '/home/usuario/PycharmProjects/cpmp/1.ck/results/' + project_name + '/' + project_name + '_' + current_hash + '_method.csv'
     print(csv_path)
     method_metrics = ['file', 'class', 'method', 'constructor', 'line', 'cbo', 'cboModified', 'fanin', 'fanout', 'wmc',
                       'rfc', 'loc', 'returnsQty', 'variablesQty', 'parametersQty', 'methodsInvokedQty',

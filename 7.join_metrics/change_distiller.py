@@ -3,7 +3,7 @@ import pandas as pd
 
 def join_change_distiller(project_name, current_hash):
     print("Change distiller")
-    csv_path = '../6.cd/results/' + project_name + '-methods-results.csv'
+    csv_path = '../6.cd/' + project_name + '-results.csv'
 
     metrics = ["PROJECT_NAME", "CURRENT_COMMIT", "PREVIOUS_COMMIT", "CLASS_CURRENTCOMMIT",
                              "CLASS_PREVIOUSCOMMIT",

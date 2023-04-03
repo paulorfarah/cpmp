@@ -1,3 +1,5 @@
+import sys
+
 import pydriller
 import argparse
 from csv import reader
@@ -31,20 +33,21 @@ def compare_classes(pathA, pathB, currentCommit, previousCommit):
     filesB = pathB.files()
     filesA = [x for x in filesA if x.endswith('.java')]
     filesB = [x for x in filesB if x.endswith('.java')]
-    csvPath = args.absolutePath + 'results/' + args.projectName + "-methods-results.csv"
+    csvPath = args.absolutePath + 'results/' + args.projectName + "-cd-methods-results.csv"
     try:
         f = open(csvPath, "x")
     except:
-        print("file exists")
+        # print("file exists")
+        print(sys.exc_info())
     for file in filesA:
         file_temp = file.replace(args.absolutePath + "projectA", '')
         if any(file_temp in s for s in filesB):
             file2 = args.absolutePath + "projectB" + file_temp
             # classPreviousCommit classCurrentCommit csvPath projectName currentCommit previousCommit
 
-            subprocess.call(['/usr/lib/jvm/java-19-openjdk-amd64/bin/java', '-jar',
+            subprocess.call(['/usr/lib/jvm/jdk-19/bin/java', '-jar',
                              'JMethodsExtractor-0.0.1-SNAPSHOT-jar-with-dependencies.jar', 'file', file, currentCommit])
-            subprocess.call(['/usr/lib/jvm/java-19-openjdk-amd64/bin/java', '-jar',
+            subprocess.call(['/usr/lib/jvm/jdk-19/bin/java', '-jar',
                              'JMethodsExtractor-0.0.1-SNAPSHOT-jar-with-dependencies.jar', 'file', file2,
                              previousCommit])
 

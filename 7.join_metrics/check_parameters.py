@@ -12,9 +12,13 @@ def extract_params(row):
     if m:
         p = re.findall('[a-zA-Z0-9\._\[\]]+,|[a-zA-Z0-9\._\[\]]+\)', m.group(0))
         for param in p:
+            param = param.replace(',', '').replace(')', '')
             last = param.rsplit('.', 1)[-1]
-            # params.append(last.replace(',', '').replace(')', ''))
-            params_list[last].append(param)
+            if last not in params_list:
+                params_list[last] = [param]
+            else:
+                if last not in params_list[param]:
+                    params_list[last].append(param)
 
 
 if __name__ == "__main__":
@@ -32,6 +36,7 @@ if __name__ == "__main__":
         # writer = csv.writer(f)
         missing = []
         parameters = {}
+
         for tag in tags:
             current_hash = gr.get_commit_from_tag(tag.name).hash
             csv_path = '../2.understand/results/' + project_name + '/' + current_hash + '.csv'
@@ -47,14 +52,18 @@ if __name__ == "__main__":
                        "MaxCyclomatic", "MaxCyclomaticModified", "MaxCyclomaticStrict", "MaxEssential",
                        "MaxInheritanceTree", "MaxNesting", "PercentLackOfCohesion", "RatioCommentToCode",
                        "SumCyclomatic", "SumCyclomaticModified", "SumCyclomaticStrict", "SumEssential"]
+            df = None
+            try:
+                df = pd.read_csv(csv_path, usecols=metrics, sep=',', engine='python', index_col=False)
+                df_methods = df[df['Kind'].str.contains("Method")]
+                df_constructors = df[df['Kind'].str.contains("Constructor")]
 
-            df = pd.read_csv(csv_path, usecols=metrics, sep=',', engine='python', index_col=False)
-            df_methods = df[df['Kind'].str.contains("Method")]
-            df_constructors = df[df['Kind'].str.contains("Constructor")]
+                df_filtered = pd.concat([df_methods, df_constructors])
 
-            df_filtered = pd.concat([df_methods, df_constructors])
+                for index, row in df.iterrows():
+                    extract_params(row)
+            except:
+                print(csv_path)
 
-            for index, row in df.iterrows():
-                extract_params(row)
-
-        print(params_list)
+        for k, v in params_list.items():
+            print(k + ": " + str(v))

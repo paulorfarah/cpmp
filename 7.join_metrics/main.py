@@ -15,7 +15,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(description='Join Metrics')
     # args = ap.parse_args()
 
-    projects = ['commons-bcel']
+    projects = ['commons-io']
     for project_name in projects:
         repo_path = "repos/" + project_name
         gr = pydriller.Git(repo_path)
@@ -32,15 +32,16 @@ if __name__ == "__main__":
             current_hash = gr.get_commit_from_tag(tag.name).hash
 
             try:
-                ck = join_ck(project_name, current_hash)
-                und = join_understand(project_name, current_hash)
-                df_joined = pd.merge(left=ck, right=und, left_on='method_name', right_on='Name', how='outer', indicator=True)
 
-                df_disjoint = df_joined.query('_merge != "both"')[['method_name', 'Name']]
+                df_joined = join_ck(project_name, current_hash)
+                df_joined['commit'] = current_hash
+                # und = join_understand(project_name, current_hash)
+                # df_joined = pd.merge(left=df_joined, right=und, left_on='method_name', right_on='Name', how='outer', indicator=True)
+                # df_disjoint = df_joined.query('_merge != "both"')[['method_name', 'Name']]
 
                 evo = join_evo(project_name, current_hash)
-                df_joined = pd.merge(left=df_joined, right=evo, left_on='class', right_on='className')
-
+                df_joined = pd.merge(left=df_joined, right=evo, on=['commit', 'method_name'], how='outer', indicator=True)
+                df_disjoint = df_joined.query('_merge != "both"')[['method_name']]
                 # smells = join_smells(project_name, current_hash)
                 # df_joined = pd.merge(left=df_joined, right=smells, left_on='class', right_on='fullyQualifiedName')
 
