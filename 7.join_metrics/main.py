@@ -32,16 +32,17 @@ if __name__ == "__main__":
             current_hash = gr.get_commit_from_tag(tag.name).hash
 
             try:
-
                 df_joined = join_ck(project_name, current_hash)
                 df_joined['commit'] = current_hash
-                # und = join_understand(project_name, current_hash)
-                # df_joined = pd.merge(left=df_joined, right=und, left_on='method_name', right_on='Name', how='outer', indicator=True)
+
+                und = join_understand(project_name, current_hash)
+                df_joined = pd.merge(left=df_joined, right=und, on='method_name', how='inner')
                 # df_disjoint = df_joined.query('_merge != "both"')[['method_name', 'Name']]
 
                 evo = join_evo(project_name, current_hash)
-                df_joined = pd.merge(left=df_joined, right=evo, on=['commit', 'method_name'], how='outer', indicator=True)
-                df_disjoint = df_joined.query('_merge != "both"')[['method_name']]
+                df_joined = pd.merge(left=df_joined, right=evo, on='method_name', how='inner')
+                # df_disjoint = df_joined.query('_merge != "both"')[['method_name']]
+
                 # smells = join_smells(project_name, current_hash)
                 # df_joined = pd.merge(left=df_joined, right=smells, left_on='class', right_on='fullyQualifiedName')
 
