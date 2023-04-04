@@ -74,12 +74,12 @@ def compare_classes(pathA, pathB, currentCommit, previousCommit):
 
                         method_file_A_renamed = args.absolutePath + transform_method_to_class(method_file_A)
                         method_file_B_renamed = args.absolutePath + transform_method_to_class(method_file_B)
-                        cd_cmd = '/usr/lib/jvm/java-8-openjdk-amd64/bin/java -jar ChangeDistillerReader-0.0.1-SNAPSHOT-jar-with-dependencies.jar ' + method_file_A_renamed + ' ' + method_file_B_renamed + ' ' + csvPath + ' ' + args.projectName + ' ' + currentCommit + ' ' + previousCommit + ' ' + method_file_A + ' ' +method_file_B
+                        cd_cmd = '/usr/lib/jvm/java-8-openjdk-amd64/bin/java -jar ChangeDistillerReader-methods-0.0.1-SNAPSHOT-jar-with-dependencies.jar ' + method_file_A_renamed + ' ' + method_file_B_renamed + ' ' + csvPath + ' ' + args.projectName + ' ' + currentCommit + ' ' + previousCommit + ' ' + method_file_A + ' ' +method_file_B
                         print(cd_cmd)
                         # subprocess.call(['java', '-jar', 'ChangeDistillerReader-0.0.1-SNAPSHOT-jar-with-dependencies.jar',
                         #                  '"' + method_file_B + '"', '"' + method_file_A + '"', csvPath, args.projectName, currentCommit, previousCommit])
                         print(subprocess.check_output((['/usr/lib/jvm/java-8-openjdk-amd64/bin/java', '-jar',
-                                                        'ChangeDistillerReader-0.0.1-SNAPSHOT-jar-with-dependencies.jar',
+                                                        'ChangeDistillerReader-methods-0.0.1-SNAPSHOT-jar-with-dependencies.jar',
                                                         method_file_A_renamed, method_file_B_renamed, csvPath,
                                                         args.projectName, currentCommit, previousCommit, method_file_A, method_file_B])))
 

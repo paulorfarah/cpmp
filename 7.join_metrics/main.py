@@ -15,7 +15,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(description='Join Metrics')
     # args = ap.parse_args()
 
-    projects = ['commons-io']
+    projects = ['commons-bcel']
     for project_name in projects:
         repo_path = "repos/" + project_name
         gr = pydriller.Git(repo_path)
@@ -36,8 +36,10 @@ if __name__ == "__main__":
                 df_joined['commit'] = current_hash
 
                 und = join_understand(project_name, current_hash)
-                df_joined = pd.merge(left=df_joined, right=und, on='method_name', how='inner')
-                # df_disjoint = df_joined.query('_merge != "both"')[['method_name', 'Name']]
+                df_joined = pd.merge(left=df_joined, right=und, on='method_name', how='outer', indicator=True)
+                df_disjoint = df_joined.query('_merge != "both"')[['method_name', 'Name']]
+
+                # df_joined = pd.merge(left=df_joined, right=und, on='method_name', how='inner')
 
                 evo = join_evo(project_name, current_hash)
                 df_joined = pd.merge(left=df_joined, right=evo, on='method_name', how='inner')

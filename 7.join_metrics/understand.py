@@ -16,7 +16,7 @@ def format_method(row):
 
 def join_understand(project_name, current_hash):
     # print("Understand ")
-    csv_path = '../2.understand/results/' + project_name + '/' + current_hash + '.csv'
+    csv_path = '../2.understand/' + project_name + '/' + current_hash + '.csv'
 
     # understandRepo = pydriller.Git(csvPathUndestand)
     metrics = ["Kind", "Name", "File", "AvgCyclomatic", "AvgCyclomaticModified", "AvgCyclomaticStrict",
@@ -37,6 +37,6 @@ def join_understand(project_name, current_hash):
     df_constructors = df[df['Kind'].str.contains("Constructor")]
 
     df_filtered = pd.concat([df_methods, df_constructors])
-    df['method_name'] = df.apply(format_method, axis=1)
+    df_filtered['method_name'] = df.apply(format_method, axis=1)
     # print(df_filtered.shape[0])
     return df_filtered
