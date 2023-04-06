@@ -61,11 +61,15 @@ def compare_classes(pathA, pathB, currentCommit, previousCommit):
             except FileNotFoundError:
                 if method_files_A:
                     print('[>>>FileNotFound]: ' + methods_path_A + '! \n Check if class has methods...')
+                else:
+                    print(sys.exc_info())
             try:
                 method_files_B = [f for f in listdir(methods_path_B) if isfile(join(methods_path_B, f))]
             except FileNotFoundError:
                 if method_files_B:
                     print('[>>>FileNotFound]: ' + methods_path_B + '! \n Check if class has methods...')
+                else:
+                    print(sys.exc_info())
 
             if method_files_A and method_files_B:
                 for method_file in method_files_A:
@@ -76,14 +80,18 @@ def compare_classes(pathA, pathB, currentCommit, previousCommit):
                         method_file_A_renamed = args.absolutePath + transform_method_to_class(method_file_A)
                         method_file_B_renamed = args.absolutePath + transform_method_to_class(method_file_B)
                         cd_cmd = '/usr/lib/jvm/java-8-openjdk-amd64/bin/java -jar ChangeDistillerReader-methods-0.0.1-SNAPSHOT-jar-with-dependencies.jar ' + method_file_A_renamed + ' ' + method_file_B_renamed + ' ' + csvPath + ' ' + args.projectName + ' ' + currentCommit + ' ' + previousCommit + ' ' + method_file_A + ' ' +method_file_B
-                        print(cd_cmd)
+                        # print(cd_cmd)
                         # subprocess.call(['java', '-jar', 'ChangeDistillerReader-0.0.1-SNAPSHOT-jar-with-dependencies.jar',
                         #                  '"' + method_file_B + '"', '"' + method_file_A + '"', csvPath, args.projectName, currentCommit, previousCommit])
-                        print(subprocess.check_output((['/usr/lib/jvm/java-8-openjdk-amd64/bin/java', '-jar',
+                        res = subprocess.check_output((['/usr/lib/jvm/java-8-openjdk-amd64/bin/java', '-jar',
                                                         'ChangeDistillerReader-methods-0.0.1-SNAPSHOT-jar-with-dependencies.jar',
                                                         method_file_A_renamed, method_file_B_renamed, csvPath,
-                                                        args.projectName, currentCommit, previousCommit, method_file_A, method_file_B])))
+                                                        args.projectName, currentCommit, previousCommit, method_file_A, method_file_B]))
 
+            elif method_files_A:
+                print('files not found in previous path')
+            else:
+                print('files not found in current path')
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description='Extractor for changeDistiller')
@@ -111,11 +119,10 @@ if __name__ == "__main__":
     releases = df['Hash']
     prev_release = None
     for current_release in releases:
+        print(current_release)
         if not prev_release:
             prev_release = current_release
         else:
-            # hashA = pathA.get_commit_from_tag(prev_release).hash
-            # hashB = pathB.get_commit_from_tag(tag).hash
             pathA.checkout(prev_release)
             pathB.checkout(current_release)
             compare_classes(pathA, pathB, str(prev_release), str(current_release))
