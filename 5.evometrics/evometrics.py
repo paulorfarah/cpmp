@@ -7,6 +7,7 @@ from os import listdir
 from os.path import isfile, join
 
 import myers as myers
+import pandas as pd
 import pydriller
 import argparse
 from csv import reader
@@ -62,7 +63,6 @@ if __name__ == "__main__":
     tags = repo.tags
 
     release = 1
-    commit_A = ''
     boc_list = {}
     fch_list = {}
     lch_list = {}
@@ -82,19 +82,27 @@ if __name__ == "__main__":
     csv_path = absolute_path + "results/" + args.project_name + "-methods-results-processMetrics.csv"
     f = open(csv_path, "w")
     writer = csv.writer(f)
-    previous_release = None
+
+    commits = []
     for tag in tags:
-        current_release = path_A.get_commit_from_tag(tag.name).hash
-        print(current_release, tag.name)
+        hash = path_A.get_commit_from_tag(tag.name).hash
+        # print(tag.name, hash, tag.commit.committed_date)
+        commit = [tag.name, hash, tag.commit.committed_date]
+        commits.append(commit)
+    df = pd.DataFrame(commits, columns=['Tag', 'Hash', 'Commiter_date'])
+    df = df.sort_values(by=['Commiter_date', 'Tag'])
+    releases = df['Hash']
+
+    previous_release = None
+    # for tag in tags:
+    #     current_release = path_A.get_commit_from_tag(tag.name).hash
+    for current_release in releases:
+        # print(current_release, tag.name)
         path_A.checkout(current_release)
         files = path_A.files()
         files = [x for x in files if x.endswith('.java')]
 
         if release == 1:
-            # commit_A = tag
-            # print('prev: None')
-            # print('curr: ' + current_release)
-
             header = ['project', 'commit', 'commitprevious', 'release', 'file', 'method', 'BOC', 'TACH', 'FCH', 'LCH',
                       'CHO', 'FRCH', 'CHD', 'WCH', 'WCD', 'WFR', 'ATAF', 'LCA', 'LCD', 'CSB', 'CSBS', 'ACDF']
             writer.writerow(header)
@@ -135,7 +143,6 @@ if __name__ == "__main__":
             csb = 0
             csbs = 0
             acdf = 0
-            # previous_release = path_A.get_commit_from_tag(commit_A.name).hash
 
             commits_between_releases = Repository(args.pathA, from_commit=previous_release,
                                                   to_commit=current_release).traverse_commits()
@@ -387,6 +394,5 @@ if __name__ == "__main__":
         # print('curr: ' + current_release)
         # print('--------')
         previous_release = current_release
-        commit_A = tag
         release += 1
     f.close()
