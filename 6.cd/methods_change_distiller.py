@@ -1,5 +1,6 @@
 import sys
 
+import pandas as pd
 import pydriller
 import argparse
 from csv import reader
@@ -97,17 +98,25 @@ if __name__ == "__main__":
     repo = git.Repo(args.pathA)
     tags = repo.tags
 
-    i = 0
-    commit_A = ''
-    commit_B = ''
+    commits = []
     for tag in tags:
-        if i == 0:
-            commit_A = tag
-            i += 1
+        hash = pathA.get_commit_from_tag(tag.name).hash
+        # print(tag.name, hash, tag.commit.committed_date)
+        commit = [tag.name, hash, tag.commit.committed_date]
+        commits.append(commit)
+    df = pd.DataFrame(commits, columns=['Tag', 'Hash', 'Commiter_date'])
+    df = df.sort_values(by=['Commiter_date',  'Tag'])
+    # print(df.head(40))
+
+    releases = df['Hash']
+    prev_release = None
+    for current_release in releases:
+        if not prev_release:
+            prev_release = current_release
         else:
-            hashA = pathA.get_commit_from_tag(commit_A.name).hash
-            hashB = pathB.get_commit_from_tag(tag.name).hash
-            pathA.checkout(hashA)
-            pathB.checkout(hashB)
-            compare_classes(pathA, pathB, str(hashA), str(hashB))
-            commit_A = tag
+            # hashA = pathA.get_commit_from_tag(prev_release).hash
+            # hashB = pathB.get_commit_from_tag(tag).hash
+            pathA.checkout(prev_release)
+            pathB.checkout(current_release)
+            compare_classes(pathA, pathB, str(prev_release), str(current_release))
+            prev_release = current_release
