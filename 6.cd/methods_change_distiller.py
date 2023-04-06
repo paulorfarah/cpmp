@@ -29,7 +29,7 @@ def transform_method_to_class(method_file):
     return file_name
 
 
-def compare_classes(pathA, pathB, currentCommit, previousCommit):
+def compare_classes(java, pathA, pathB, currentCommit, previousCommit):
     filesA = pathA.files()
     filesB = pathB.files()
     filesA = [x for x in filesA if x.endswith('.java')]
@@ -46,9 +46,9 @@ def compare_classes(pathA, pathB, currentCommit, previousCommit):
             file2 = args.absolutePath + "projectB" + file_temp
             # classPreviousCommit classCurrentCommit csvPath projectName currentCommit previousCommit
 
-            subprocess.call(['/usr/lib/jvm/jdk-19/bin/java', '-jar',
+            subprocess.call([java, '-jar',
                              'JMethodsExtractor-0.0.1-SNAPSHOT-jar-with-dependencies.jar', 'file', file, currentCommit])
-            subprocess.call(['/usr/lib/jvm/jdk-19/bin/java', '-jar',
+            subprocess.call([java, '-jar',
                              'JMethodsExtractor-0.0.1-SNAPSHOT-jar-with-dependencies.jar', 'file', file2,
                              previousCommit])
 
@@ -99,6 +99,7 @@ if __name__ == "__main__":
     ap.add_argument('--pathB', required=True)
     ap.add_argument('--projectName', required=True)
     ap.add_argument('--absolutePath', required=True)
+    ap.add_argument('--java', required=True)
     args = ap.parse_args()
 
     pathA = pydriller.Git(args.pathA)
@@ -125,5 +126,5 @@ if __name__ == "__main__":
         else:
             pathA.checkout(prev_release)
             pathB.checkout(current_release)
-            compare_classes(pathA, pathB, str(prev_release), str(current_release))
+            compare_classes(args.java, pathA, pathB, str(prev_release), str(current_release))
             prev_release = current_release
