@@ -1,15 +1,14 @@
-
-import pydriller
 import argparse
-import git
-import pandas as pd
-import numpy as np
 
-from ck import join_ck
-from understand import join_understand
-from evo import join_evo
+import git
+import numpy as np
+import pandas as pd
+import pydriller
+
 from change_distiller import join_change_distiller
-from smells import join_smells
+from ck import join_ck
+from evo import join_evo
+from understand import join_understand
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description='Join Metrics')
@@ -31,45 +30,66 @@ if __name__ == "__main__":
         for tag in tags:
             current_hash = gr.get_commit_from_tag(tag.name).hash
 
-            try:
-                df_joined = join_ck(project_name, current_hash)
-                df_joined['commit'] = current_hash
+            # try:
+            df_joined = join_ck(project_name, current_hash)
+            df_joined['commit'] = current_hash
 
-                und = join_understand(project_name, current_hash)
-                df_joined = pd.merge(left=df_joined, right=und, on='method_name', how='outer', indicator=True)
-                df_disjoint = df_joined.query('_merge != "both"')[['method_name', 'Name']]
+            # df_joined = join_understand(project_name, current_hash)
+            und = join_understand(project_name, current_hash)
+            # df_joined_outer = pd.merge(left=df_joined, right=und, on='method_name', how='outer', indicator=True)
+            # df_disjoint_left = df_joined_outer.query('_merge == "left_only"')[['method_name', 'Name', '_merge']]
+            # df_disjoint_right = df_joined_outer.query('_merge == "right_only"')[['method_name', 'Name', '_merge']]
+            # df_disjoint_both = df_joined_outer.query('_merge != "both"')[['method_name', 'Name', '_merge']]
+            df_joined = pd.merge(left=df_joined, right=und, on='method_name', how='inner')
 
-                # df_joined = pd.merge(left=df_joined, right=und, on='method_name', how='inner')
+            # print(len(df_joined_outer.index), len(df_disjoint_left.index), len(df_disjoint_right), len(df_disjoint_both.index), len(df_joined_inner))
+            evo = join_evo(project_name, current_hash)
+            # df_joined_outer = pd.merge(left=df_joined, right=evo, on='method_name', how='outer', indicator=True)
+            # df_disjoint = df_joined_outer.query('_merge != "both"')[['method_name',  '_merge']]
+            # df_disjoint_both = df_joined_outer.query('_merge != "both"')[['method_name', '_merge']]
+            # df_disjoint_right = df_joined_outer.query('_merge == "right_only"')[['method_name','_merge']]
+            # df_disjoint_left = df_joined_outer.query('_merge == "left_only"')[['method_name', '_merge']]
+            df_joined = pd.merge(left=df_joined, right=evo, on='method_name', how='inner')
 
-                evo = join_evo(project_name, current_hash)
-                df_joined = pd.merge(left=df_joined, right=evo, on='method_name', how='inner')
-                # df_disjoint = df_joined.query('_merge != "both"')[['method_name']]
+            # print(len(df_joined_outer.index), len(df_disjoint_left.index), len(df_disjoint_right),
+            #       len(df_disjoint_both.index), len(df_joined))
 
-                # smells = join_smells(project_name, current_hash)
-                # df_joined = pd.merge(left=df_joined, right=smells, left_on='class', right_on='fullyQualifiedName')
+            # smells = join_smells(project_name, current_hash)
+            # df_joined = pd.merge(left=df_joined, right=smells, left_on='class', right_on='fullyQualifiedName')
 
-                # merged_full = pd.merge(left=ck_understand_process_organic, right=releaseChangeDistillerMetrics,
-                #                        left_on='class', right_on='CLASS_PREVIOUSCOMMIT')
+            # merged_full = pd.merge(left=ck_understand_process_organic, right=releaseChangeDistillerMetrics,
+            #                        left_on='class', right_on='CLASS_PREVIOUSCOMMIT')
 
-                change_distiller = join_change_distiller(project_name, current_hash)
-                df_joined = pd.merge(left=df_joined, right=change_distiller,
-                                     left_on='class', right_on='CLASS_PREVIOUSCOMMIT')
+            change_distiller = join_change_distiller(project_name, current_hash)
+            df_joined_outer = pd.merge(left=df_joined, right=change_distiller, on='method_name', how='outer',
+                                       indicator=True)
+            df_disjoint = df_joined_outer.query('_merge != "both"')[['method_name', '_merge']]
+            df_disjoint_both = df_joined_outer.query('_merge != "both"')[['method_name', '_merge']]
+            df_disjoint_right = df_joined_outer.query('_merge == "right_only"')[['method_name', '_merge']]
+            df_disjoint_left = df_joined_outer.query('_merge == "left_only"')[['method_name', '_merge']]
+            df_joined = pd.merge(left=df_joined, right=change_distiller,
+                                 on='method_name', how='inner')
 
-                # df_joined.loc[:,'class_frequency'] = 1
-                df_joined.loc[:, 'will_change'] = 0
-                # df_joined.loc[:,'number_of_changes'] = 0
-                df_joined.loc[:, 'release'] = release
-                medianChanges = df_joined['TOTAL_CHANGES'].median()
-                df_joined['will_change'] = np.where(df_joined['TOTAL_CHANGES'] > medianChanges, 1, 0)
-                if release == 1:
-                    df_joined.to_csv(csv_results, index=False)
-                else:
-                    df_joined.to_csv(csv_results, mode="a", header=False, index=False)
+            print('all left right left+right inner')
+            print(len(df_joined_outer.index), len(df_disjoint_left.index), len(df_disjoint_right),
+                  len(df_disjoint_both.index), len(df_joined))
+            # listclass.list(String)
 
-                release += 1
-            except Exception as e:
-                print(e)
-                # print(hashCurrent)
-                missing.append(current_hash)
+            # df_joined.loc[:,'class_frequency'] = 1
+            df_joined.loc[:, 'will_change'] = 0
+            # df_joined.loc[:,'number_of_changes'] = 0
+            df_joined.loc[:, 'release'] = release
+            medianChanges = df_joined['TOTAL_CHANGES'].median()
+            df_joined['will_change'] = np.where(df_joined['TOTAL_CHANGES'] > medianChanges, 1, 0)
+            if release == 1:
+                df_joined.to_csv(csv_results, index=False)
+            else:
+                df_joined.to_csv(csv_results, mode="a", header=False, index=False)
 
-        print(missing)
+            release += 1
+        #     except Exception as e:
+        #         print(e)
+        #         # print(hashCurrent)
+        #         missing.append(current_hash)
+        #
+        # print(missing)

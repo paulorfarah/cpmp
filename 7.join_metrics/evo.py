@@ -2,7 +2,7 @@ import re
 
 import pandas as pd
 
-packs = {'commons-bcel': 'org',
+packs = {'commons-bcel': ['examples\/', 'src\/java\/'],
          'commons-io': 'org',
          'junit': 'org',
          'pdfbox': 'org',
@@ -10,14 +10,31 @@ packs = {'commons-bcel': 'org',
          }
 
 
+
+# def format_method(row):
+#     method_name = row['method'].replace('/', '.')
+#
+#     proj = row['project']
+#     pack_name = packs[proj]
+#     search_pack = re.findall(pack_name + '.+', method_name)
+#     if len(search_pack):
+#         method_name = search_pack[0]
+#
+#     return method_name
+
 def format_method(row):
-    method_name = row['method'].replace('/', '.')
+    method_name = row['method']
 
     proj = row['project']
-    pack_name = packs[proj]
-    method_name = re.findall(pack_name + '.+', method_name)[0]
+    for p in packs[proj]:
+        pattern = r'^\/' + p
+        name = re.split(pattern, method_name)
+        if len(name) > 1:
+            method_name = name[1]
 
+    method_name = method_name.replace('/', '.')
     return method_name
+
 
 def join_evo(project_name, current_hash):
     # print("evolutive")
