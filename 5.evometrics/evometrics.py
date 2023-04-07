@@ -88,16 +88,17 @@ if __name__ == "__main__":
         hash = path_A.get_commit_from_tag(tag.name).hash
         # print(tag.name, hash, tag.commit.committed_date)
         commit = [tag.name, hash, tag.commit.committed_date]
-        commits.append(commit)
+        if commit not in commits:
+            commits.append(commit)
     df = pd.DataFrame(commits, columns=['Tag', 'Hash', 'Commiter_date'])
     df = df.sort_values(by=['Commiter_date', 'Tag'])
-    releases = df['Hash']
+    releases = df['Hash'].drop_duplicates()
 
     previous_release = None
     # for tag in tags:
     #     current_release = path_A.get_commit_from_tag(tag.name).hash
     for current_release in releases:
-        # print(current_release, tag.name)
+        print(current_release, tag.name)
         path_A.checkout(current_release)
         files = path_A.files()
         files = [x for x in files if x.endswith('.java')]
