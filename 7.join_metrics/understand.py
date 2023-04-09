@@ -33,10 +33,12 @@ def join_understand(project_name, current_hash):
                          "SumCyclomatic", "SumCyclomaticModified", "SumCyclomaticStrict", "SumEssential"]
 
     df = pd.read_csv(csv_path, usecols=metrics, sep=',', engine='python', index_col=False)
+    # df = df.dropna()
     df_methods = df[df['Kind'].str.contains("Method")]
     df_constructors = df[df['Kind'].str.contains("Constructor")]
 
     df_filtered = pd.concat([df_methods, df_constructors])
-    df_filtered['method_name'] = df.apply(format_method, axis=1)
+    if len(df.index):
+        df_filtered['method_name'] = df.apply(format_method, axis=1)
     # print(df_filtered.shape[0])
     return df_filtered

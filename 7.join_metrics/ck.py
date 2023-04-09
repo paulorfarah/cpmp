@@ -30,7 +30,7 @@ def join_ck(project_name, current_hash):
     # print("CK ")
     csv_path = '../1.ck/results/' + project_name + '/' + project_name + '_' + current_hash + '_method.csv'
     # csv_path = '/home/usuario/PycharmProjects/cpmp/1.ck/results/' + project_name + '/' + project_name + '_' + current_hash + '_method.csv'
-    print(csv_path)
+    # print(csv_path)
     method_metrics = ['file', 'class', 'method', 'constructor', 'line', 'cbo', 'cboModified', 'fanin', 'fanout', 'wmc',
                       'rfc', 'loc', 'returnsQty', 'variablesQty', 'parametersQty', 'methodsInvokedQty',
                       'methodsInvokedLocalQty', 'methodsInvokedIndirectLocalQty', 'loopQty', 'comparisonsQty',
@@ -49,9 +49,6 @@ def join_ck(project_name, current_hash):
     #                      "innerClassesQty", "lambdasQty", "uniqueWordsQty", "modifiers", "logStatementsQty"]
 
     df = pd.read_csv(csv_path, usecols=method_metrics, sep=',', index_col=False)
-
-    # drinks['total_servings'] = drinks.apply(calculate, axis=1)
-    df['method_name'] = df.apply(concat_method, axis=1)
-
-    # print(df.shape[0])
+    if len(df):
+        df['method_name'] = df.apply(concat_method, axis=1)
     return df

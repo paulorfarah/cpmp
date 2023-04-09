@@ -1,26 +1,13 @@
 import re
-
 import pandas as pd
 
-packs = {'commons-bcel': ['examples\/', 'src\/java\/'],
-         'commons-io': 'org',
-         'junit': 'org',
-         'pdfbox': 'org',
-         'wro4j': 'ro.isdc.wro',
-         }
-
-
-
-# def format_method(row):
-#     method_name = row['method'].replace('/', '.')
-#
-#     proj = row['project']
-#     pack_name = packs[proj]
-#     search_pack = re.findall(pack_name + '.+', method_name)
-#     if len(search_pack):
-#         method_name = search_pack[0]
-#
-#     return method_name
+packs = {'commons-bcel': ['examples\/', 'src\/examples\/', 'src\/java\/', 'src\/main\/java\/',
+                                              'src\/test\/'],
+                             'commons-io': 'org',
+                             'junit': 'org',
+                             'pdfbox': 'org',
+                             'wro4j': 'ro.isdc.wro',
+                             }
 
 def format_method(row):
     method_name = row['method']
@@ -31,6 +18,7 @@ def format_method(row):
         name = re.split(pattern, method_name)
         if len(name) > 1:
             method_name = name[1]
+            break
 
     method_name = method_name.replace('/', '.')
     return method_name
@@ -50,7 +38,6 @@ def join_evo(project_name, current_hash):
     # evo: '/src/test/org/apache/commons/io/FileUtilsTestCase/testForceDeleteDir()'
     # ck:  'org.apache.commons.io.FileUtilsTestCase.testForceDeleteDir()'
 
-
-    df['method_name'] = df.apply(format_method, axis=1)
-    # print(df.shape[0])
+    if len(df):
+        df['method_name'] = df.apply(format_method, axis=1)
     return df

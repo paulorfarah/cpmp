@@ -361,7 +361,10 @@ if __name__ == "__main__":
                         i = 0
                         for j in range(boc, n):
                             r = j + 1
-                            chd_r = chd_list[method_short_name][i]
+                            try:
+                                chd_r = chd_list[method_short_name][i]
+                            except:
+                                print(boc)
                             wcd += chd_r * pow(2, r - n)
                             i += 1
 

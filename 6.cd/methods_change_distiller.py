@@ -110,12 +110,10 @@ if __name__ == "__main__":
     commits = []
     for tag in tags:
         hash = pathA.get_commit_from_tag(tag.name).hash
-        # print(tag.name, hash, tag.commit.committed_date)
         commit = [tag.name, hash, tag.commit.committed_date]
         commits.append(commit)
     df = pd.DataFrame(commits, columns=['Tag', 'Hash', 'Commiter_date'])
     df = df.sort_values(by=['Commiter_date',  'Tag'])
-    # print(df.head(40))
 
     releases = df['Hash']
     prev_release = None

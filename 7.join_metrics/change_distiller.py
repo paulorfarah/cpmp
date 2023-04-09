@@ -2,13 +2,13 @@ import re
 
 import pandas as pd
 
-packs = {'commons-bcel': ['examples\/', 'src\/java\/'],
-         'commons-io': 'org',
-         'junit': 'org',
-         'pdfbox': 'org',
-         'wro4j': 'ro.isdc.wro',
-         }
-
+packs = {'commons-bcel': ['examples\/', 'src\/examples\/', 'src\/java\/', 'src\/main\/java\/',
+                                              'src\/test\/'],
+                             'commons-io': 'org',
+                             'junit': 'org',
+                             'pdfbox': 'org',
+                             'wro4j': 'ro.isdc.wro',
+                             }
 
 def format_method(row):
     method_name = row['CLASS_PREVIOUSNAME']
@@ -30,7 +30,7 @@ def join_change_distiller(project_name, current_hash):
     # print("Change distiller")
     csv_path = '../6.cd/results/' + project_name + '-cd-methods-results.csv'
 
-    metrics = ["PROJECT_NAME", "CURRENT_COMMIT", "PREVIOUS_COMMIT", "CLASS_CURRENTCOMMIT", "CLASS_PREVIOUSCOMMIT",
+    metrics = ["PROJECT_NAME", "PREVIOUS_COMMIT", "CURRENT_COMMIT", "CLASS_CURRENTCOMMIT", "CLASS_PREVIOUSCOMMIT",
                "CLASS_CURRENTNAME", "CLASS_PREVIOUSNAME",
                "STATEMENT_DELETE", "STATEMENT_INSERT", "STATEMENT_ORDERING_CHANGE",
                "STATEMENT_PARENT_CHANGE", "STATEMENT_UPDATE", "TOTAL_STATEMENTLEVELCHANGES",
@@ -49,7 +49,8 @@ def join_change_distiller(project_name, current_hash):
     df.columns = metrics
     df = df[(df['CURRENT_COMMIT'] == current_hash)]
 
-    df['method_name'] = df.apply(format_method, axis=1)
+    if len(df.index):
+        df['method_name'] = df.apply(format_method, axis=1)
 
     # print(df.shape[0])
     return df
