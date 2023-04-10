@@ -2,8 +2,8 @@ import re
 import pandas as pd
 
 packs = {'commons-bcel': ['examples\/', 'src\/examples\/', 'src\/java\/', 'src\/main\/java\/',
-                                              'src\/test\/'],
-                             'commons-io': 'org',
+                                              'src\/test\/', 'src\/test\/java\/'],
+                             'commons-io': ['src\/test\/java\/', 'src\/java\/', 'src\/main\/java\/'],
                              'junit': 'org',
                              'pdfbox': 'org',
                              'wro4j': 'ro.isdc.wro',

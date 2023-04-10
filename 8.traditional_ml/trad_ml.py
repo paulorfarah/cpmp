@@ -212,7 +212,7 @@ def LogisticRegr_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     print('Std deviation: ' + str(np.std(cv_score)))
 
     print("\nTEST SET:")
-    get_scores(Ytest, lr.predict(Xtest), dataset, "LogistRegression", rs, model, ws)
+    get_scores(Ytest, lr.predict(Xtest), dataset, "LogisticRegression", rs, model, ws)
 
 
 def RandomForest_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
