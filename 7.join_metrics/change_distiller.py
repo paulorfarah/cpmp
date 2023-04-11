@@ -2,13 +2,18 @@ import re
 
 import pandas as pd
 
-packs = {'commons-bcel': ['examples\/', 'src\/examples\/', 'src\/java\/', 'src\/main\/java\/',
-                                              'src\/test\/'],
-                             'commons-io': ['src\/test\/java\/', 'src\/java\/', 'src\/main\/java\/', 'src\/test\/'],
-                             'junit4': ['src\/test\/java\/', 'src\/java\/', 'src\/main\/java\/', 'src\/test\/', ''],
-                             'pdfbox': 'org',
-                             'wro4j': 'ro.isdc.wro',
-                             }
+packs = {'commons-bcel': ['examples\/', 'src\/examples\/', 'src\/java\/', 'src\/main\/java\/', 'src\/test\/'],
+         'commons-io': ['src\/test\/java\/', 'src\/java\/', 'src\/main\/java\/', 'src\/test\/'],
+         'junit4': ['src\/test\/java\/', 'src\/java\/', 'src\/main\/java\/', 'src\/test\/', ''],
+         'pdfbox': ['src\/test\/java\/', 'src\/java\/', 'src\/main\/java\/', 'src\/test\/', ''],
+         'wro4j': ['src\/test\/java\/', 'src\/java\/', 'src\/main\/java\/', 'src\/test\/',
+                   'wro4j-examples/src/main/java/', 'wro4j-maven-plugin/src/main/java/',
+                   'wro4j-extensions/src/main/java/', 'wro4j-test-utils/src/main/java/',
+                   'wro4j-core/src/main/java/',
+                   'wro4j-examples/src/test/java/', 'wro4j-maven-plugin/src/test/java/',
+                   'wro4j-extensions/src/test/java/', 'wro4j-test-utils/src/test/java/',
+                   'wro4j-core/src/test/java/', '']
+        }
 
 def format_method(row):
     method_name = row['CLASS_PREVIOUSNAME']

@@ -1,21 +1,36 @@
-import csv
-import itertools
-import os
-
-import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
-import tensorflow as tf
-from imblearn.over_sampling import SMOTE, ADASYN, RandomOverSampler
-from imblearn.under_sampling import RandomUnderSampler, EditedNearestNeighbours, TomekLinks
-from sklearn.ensemble import RandomForestClassifier
+import numpy as np
+import statistics as st
+import matplotlib.pyplot as plt
+import csv
+
+from sklearn.model_selection import train_test_split
+
+from sklearn.utils import shuffle
+from sklearn.metrics import confusion_matrix, classification_report, roc_auc_score
+
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import (f1_score, roc_auc_score, confusion_matrix, accuracy_score)
-from sklearn.model_selection import StratifiedKFold as kf
-from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
-from sklearn.neural_network import MLPClassifier
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import AdaBoostClassifier, BaggingClassifier, GradientBoostingClassifier, RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import (f1_score, roc_auc_score, roc_curve, auc, confusion_matrix, precision_recall_curve,
+                             average_precision_score, classification_report, accuracy_score)
+from sklearn.model_selection import train_test_split, GridSearchCV, KFold, StratifiedKFold
+from sklearn.neural_network import MLPClassifier
+
+from imblearn.under_sampling import RandomUnderSampler, EditedNearestNeighbours, TomekLinks
+from imblearn.over_sampling import SMOTE, ADASYN, RandomOverSampler
+
+from sklearn.preprocessing import MinMaxScaler
+import itertools
+import operator
+
+import tensorflow as tf
+import os
+from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import SelectPercentile, chi2, SelectFpr
+from sklearn.model_selection import StratifiedKFold as kf
 
 
 def generateStandardTimeSeriesStructure(all_releases_df, ws, featureList):
@@ -119,13 +134,13 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws):
             'F1-Score(weighted)', 'F1-Score(None)', 'Accuracy', 'Sensitivity', 'Specificity', 'ROC AUC score',
             'Confusion matrix']
 
-    if not os.path.exists('results/results-tradicional-no-feature-selection-model6-7.csv'):
-        f = open("results/results-tradicional-no-feature-selection-model6-7.csv", "a")
+    if not os.path.exists('results/results-concat-no-feature-selection-model1-3.csv'):
+        f = open("results/results-concat-no-feature-selection-model1-3.csv", "a")
         writer = csv.writer(f)
         writer.writerow(head)
         f.close()
 
-    f = open("results/results-tradicional-no-feature-selection-model6-7.csv", "a")
+    f = open("results/results-concat-no-feature-selection-model1-3.csv", "a")
     writer = csv.writer(f)
     writer.writerow(scores)
     f.close()
@@ -189,6 +204,7 @@ def plot_confusion_matrixes(y_test, y_pred):
     plt.show()
 
 
+# UNDERSAMPLING
 def LogisticRegr_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     print("\nLOGISTIC REGRESSION")
     cv_score = []
@@ -212,7 +228,7 @@ def LogisticRegr_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     print('Std deviation: ' + str(np.std(cv_score)))
 
     print("\nTEST SET:")
-    get_scores(Ytest, lr.predict(Xtest), dataset, "LogisticRegression", rs, model, ws)
+    get_scores(Ytest, lr.predict(Xtest), dataset, "LogistRegression", rs, model, ws)
 
 
 def RandomForest_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
@@ -302,6 +318,110 @@ def DecisionTree_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     get_scores(Ytest, grid.predict(Xtest), dataset, "DT", rs, model, ws)
 
 
+# OVERSAMPLING
+def LogisticRegr_NoIloc(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
+    print("\nLOGISTIC REGRESSION")
+    cv_score = []
+    i = 1
+    print("TRAIN AND VALIDATION SETS:")
+    for train_index, test_index in kf.split(Xtrain, Ytrain):
+        print('{} of KFold {}'.format(i, kf.n_splits))
+        xtr_LR, xvl_LR = Xtrain[train_index], Xtrain[test_index]
+        ytr_LR, yvl_LR = Ytrain[train_index], Ytrain[test_index]
+
+        # model
+        lr = LogisticRegression(solver='lbfgs', random_state=42, class_weight='balanced', n_jobs=-1)
+        lr.fit(xtr_LR, ytr_LR)
+        score = roc_auc_score(yvl_LR, lr.predict(xvl_LR))
+        print('ROC AUC score:', score)
+        cv_score.append(score)
+        i += 1
+
+    print('\nCROSS VALIDANTION SUMMARY:')
+    print('Mean: ' + str(np.mean(cv_score)))
+    print('Std deviation: ' + str(np.std(cv_score)))
+
+    print("\nTEST SET:")
+    get_scores(Ytest, lr.predict(Xtest), dataset, "LogistRegression", rs, model, ws)
+
+
+def RandomForest_NoIloc(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
+    print("RANDOM FOREST")
+    cv_score = []
+    i = 1
+    print("TRAIN AND VALIDATION SETS:")
+    for train_index, test_index in kf.split(Xtrain, Ytrain):
+        print('{} of KFold {}'.format(i, kf.n_splits))
+        xtr_RF, xvl_RF = Xtrain[train_index], Xtrain[test_index]
+        ytr_RF, yvl_RF = Ytrain[train_index], Ytrain[test_index]
+
+        # model
+        rf = RandomForestClassifier(random_state=42, class_weight='balanced', n_estimators=100, n_jobs=-1)
+        rf.fit(xtr_RF, ytr_RF)
+        score = roc_auc_score(yvl_RF, rf.predict(xvl_RF))
+        print('ROC AUC score:', score)
+        cv_score.append(score)
+        i += 1
+
+    print('\nCROSS VALIDANTION SUMMARY:')
+    print('Mean: ' + str(np.mean(cv_score)))
+    print('Std deviation: ' + str(np.std(cv_score)))
+
+    print("\nTEST SET:")
+    get_scores(Ytest, rf.predict(Xtest), dataset, "RandomForest", rs, model, ws)
+
+
+def NN_NoIloc(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
+    print("NEURAL NETWORK")
+    cv_score = []
+    i = 1
+    print("TRAIN AND VALIDATION SETS:")
+    for train_index, test_index in kf.split(Xtrain, Ytrain):
+        print('{} of KFold {}'.format(i, kf.n_splits))
+        xtr_NN, xvl_NN = Xtrain[train_index], Xtrain[test_index]
+        ytr_NN, yvl_NN = Ytrain[train_index], Ytrain[test_index]
+
+        # model
+        nn = MLPClassifier(random_state=42)
+        nn.fit(xtr_NN, ytr_NN)
+        score = roc_auc_score(yvl_NN, nn.predict(xvl_NN))
+        print('ROC AUC score:', score)
+        cv_score.append(score)
+        i += 1
+
+    print('\nCROSS VALIDANTION SUMMARY:')
+    print('Mean: ' + str(np.mean(cv_score)))
+    print('Std deviation: ' + str(np.std(cv_score)))
+
+    print("\nTEST SET:")
+    get_scores(Ytest, nn.predict(Xtest), dataset, "MLP", rs, model, ws)
+
+
+def DecisionTree_NoIloc(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
+    print("\nDECISION TREE")
+    cv_score = []
+    i = 1
+    print("TRAIN AND VALIDATION SETS:")
+    for train_index, test_index in kf.split(Xtrain, Ytrain):
+        print('{} of KFold {}'.format(i, kf.n_splits))
+        xtr_DT, xvl_DT = Xtrain[train_index], Xtrain[test_index]
+        ytr_DT, yvl_DT = Ytrain[train_index], Ytrain[test_index]
+        # model
+        dt = DecisionTreeClassifier(random_state=42, class_weight='balanced')
+        dt.fit(xtr_DT, ytr_DT)
+        score = roc_auc_score(yvl_DT, dt.predict(xvl_DT))
+        print('ROC AUC score:', score)
+        cv_score.append(score)
+        i += 1
+
+    print('\nCROSS VALIDANTION SUMMARY:')
+    print('Mean: ' + str(np.mean(cv_score)))
+    print('Std deviation: ' + str(np.std(cv_score)))
+
+    print("\nTEST SET:")
+    get_scores(Ytest, dt.predict(Xtest), dataset, "DT", rs, model, ws)
+
+
 if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
     if tf.test.gpu_device_name():
@@ -344,7 +464,7 @@ if __name__ == '__main__':
     model3 = evolutionary_metrics
 
     # datasets = ['commons-bcel','commons-io','junit4','pdfbox','wro4j']
-    datasets = ['commons-bcel']
+    datasets = ['pdfbox', 'wro4j']
 
     main_columns = [
         # ck
@@ -391,45 +511,36 @@ if __name__ == '__main__':
         "ADDING_CLASS_DERIVABILITY", "ADDING_CLASS_DERIVABILITY", "ADDING_METHOD_OVERRIDABILITY",
         "TOTAL_DECLARATIONPARTCHANGES", "TOTAL_CHANGES", "will_change"
     ]
-
     # resamples= ['NONE','RUS','ENN','TL','ROS','SMOTE','ADA']
     # resamples= ['RUS','ENN','TL','ROS','SMOTE','ADA']
     resamples = ['NONE', 'ROS', 'SMOTE', 'ADA']
-    windowsize = [0]
+    windowsize = [2, 3, 4]
     models = [{'key': 'model1', 'value': model1}, {'key': 'model2', 'value': model2},
               {'key': 'model3', 'value': model3}]
-    # models = [{'key':'model4', 'value': model4}, {'key': 'model6', 'value': model6}, {'key': 'model7', 'value': model7}]
     for dataset in datasets:
         for ws in windowsize:
             for rs in resamples:
                 for model in models:
                     all_releases_df = pd.read_csv(
-                        '../7.join_metrics/results/' + dataset + '-all-releases.csv')
-
+                        'datasets/' + dataset + '-all-releases.csv', usecols=main_columns)
                     all_releases_df = all_releases_df.fillna(0)
-                    all_releases_df.columns = main_columns
+
                     # x_raw = all_releases_df[model.get('value')]
                     # y_raw = all_releases_df['will_change']
                     # Feature selection
                     # X_new = SelectPercentile(chi2, percentile=50).fit(x_raw, y_raw)
-                    #  X_new = SelectFpr(chi2, alpha=0.05).fit(x_raw, y_raw)
+                    # X_new = SelectFpr(chi2, alpha=0.05).fit(x_raw, y_raw)
 
-                    #  mask = X_new.get_support()  # list of booleans
-                    #   new_features = []  # The list of your K best features
+                    # mask = X_new.get_support()  # list of booleans
+                    # new_features = []  # The list of your K best features
 
                     # for bool, feature in zip(mask, model.get('value')):
-                    #     if bool:
-                    #          new_features.append(feature)
-                    #   print(new_features)
+                    #    if bool:
+                    #        new_features.append(feature)
+                    # print(new_features)
 
-                    # X, y = generateStandardTimeSeriesStructure(all_releases_df, ws, new_features)
-                    print("Filtering required columns into X features...")
-                    X = all_releases_df[model.get('value')].copy()
-                    print("... DONE!")
+                    X, y = generateStandardTimeSeriesStructure(all_releases_df, ws, model.get('value'))
 
-                    print("Setting y column containing label of change-proneness...")
-                    y = pd.DataFrame(all_releases_df.loc[:, 'will_change'])
-                    print("... DONE!")
                     print("Declaring a dictionary to save results...")
                     results_dict = dict()
                     print("... DONE!")
