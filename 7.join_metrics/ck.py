@@ -10,6 +10,7 @@ def concat_method(row):
 
     method_name = re.sub('\/[0-9]+\[', '(', method_name)
     method_name = re.sub('\]$', ')', method_name)
+    method_name = re.sub('\<[a-zA-Z0-9.]+\>', '', method_name)
 
     m = re.search('\([a-zA-Z0-9\._,\[\]]+\)$', method_name)
     if m:

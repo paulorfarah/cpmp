@@ -14,7 +14,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(description='Join Metrics')
     # args = ap.parse_args()
 
-    projects = ['commons-bcel']
+    projects = ['junit4']
     for project_name in projects:
         repo_path = "repos/" + project_name
         gr = pydriller.Git(repo_path)
@@ -49,10 +49,10 @@ if __name__ == "__main__":
 
                 # df_joined = join_understand(project_name, current_hash)
                 und = join_understand(project_name, current_hash)
-                # df_joined_outer = pd.merge(left=df_joined, right=und, on='method_name', how='outer', indicator=True)
-                # df_disjoint_left = df_joined_outer.query('_merge == "left_only"')[['method_name', 'Name', '_merge']]
-                # df_disjoint_right = df_joined_outer.query('_merge == "right_only"')[['method_name', 'Name', '_merge']]
-                # df_disjoint_both = df_joined_outer.query('_merge != "both"')[['method_name', 'Name', '_merge']]
+                df_joined_outer = pd.merge(left=df_joined, right=und, on='method_name', how='outer', indicator=True)
+                df_disjoint_left = df_joined_outer.query('_merge == "left_only"')[['method_name', 'Name', '_merge']]
+                df_disjoint_right = df_joined_outer.query('_merge == "right_only"')[['method_name', 'Name', '_merge']]
+                df_disjoint_both = df_joined_outer.query('_merge != "both"')[['method_name', 'Name', '_merge']]
                 if len(und.index) and len(df_joined.index):
                     df_joined = pd.merge(left=df_joined, right=und, on='method_name', how='inner')
 

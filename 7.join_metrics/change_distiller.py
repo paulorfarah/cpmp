@@ -4,8 +4,8 @@ import pandas as pd
 
 packs = {'commons-bcel': ['examples\/', 'src\/examples\/', 'src\/java\/', 'src\/main\/java\/',
                                               'src\/test\/'],
-                             'commons-io': 'org',
-                             'junit': 'org',
+                             'commons-io': ['src\/test\/java\/', 'src\/java\/', 'src\/main\/java\/', 'src\/test\/'],
+                             'junit4': ['src\/test\/java\/', 'src\/java\/', 'src\/main\/java\/', 'src\/test\/', ''],
                              'pdfbox': 'org',
                              'wro4j': 'ro.isdc.wro',
                              }

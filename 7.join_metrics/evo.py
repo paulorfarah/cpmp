@@ -3,10 +3,10 @@ import pandas as pd
 
 packs = {'commons-bcel': ['examples\/', 'src\/examples\/', 'src\/java\/', 'src\/main\/java\/',
                                               'src\/test\/', 'src\/test\/java\/'],
-                             'commons-io': ['src\/test\/java\/', 'src\/java\/', 'src\/main\/java\/'],
-                             'junit': 'org',
-                             'pdfbox': 'org',
-                             'wro4j': 'ro.isdc.wro',
+         'commons-io': ['src\/test\/java\/', 'src\/java\/', 'src\/main\/java\/', 'src\/test\/'],
+         'junit4': ['src\/test\/java\/', 'src\/java\/', 'src\/main\/java\/', 'src\/test\/', ''],
+         'pdfbox': 'org',
+         'wro4j': 'ro.isdc.wro',
                              }
 
 def format_method(row):
@@ -21,6 +21,7 @@ def format_method(row):
             break
 
     method_name = method_name.replace('/', '.')
+    method_name = method_name.replace(' ', '')
     return method_name
 
 
