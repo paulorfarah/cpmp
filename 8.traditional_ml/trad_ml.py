@@ -119,13 +119,13 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws):
             'F1-Score(weighted)', 'F1-Score(None)', 'Accuracy', 'Sensitivity', 'Specificity', 'ROC AUC score',
             'Confusion matrix']
 
-    if not os.path.exists('results/results-tradicional-no-feature-selection-model6-7.csv'):
-        f = open("results/results-tradicional-no-feature-selection-model6-7.csv", "a")
+    if not os.path.exists('results/results-tradicional-no-feature-selection-model1-3.csv'):
+        f = open("results/results-tradicional-no-feature-selection-model1-3.csv", "a")
         writer = csv.writer(f)
         writer.writerow(head)
         f.close()
 
-    f = open("results/results-tradicional-no-feature-selection-model6-7.csv", "a")
+    f = open("results/results-tradicional-no-feature-selection-model1-3.csv", "a")
     writer = csv.writer(f)
     writer.writerow(scores)
     f.close()

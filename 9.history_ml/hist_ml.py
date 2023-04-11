@@ -522,7 +522,7 @@ if __name__ == '__main__':
             for rs in resamples:
                 for model in models:
                     all_releases_df = pd.read_csv(
-                        'datasets/' + dataset + '-all-releases.csv', usecols=main_columns)
+                        '../7.join_metrics/results/' + dataset + '-all-releases.csv', usecols=main_columns)
                     all_releases_df = all_releases_df.fillna(0)
 
                     # x_raw = all_releases_df[model.get('value')]
