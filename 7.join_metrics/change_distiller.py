@@ -21,7 +21,8 @@ packs = {'commons-bcel': ['examples\/', 'src\/examples\/', 'src\/java\/', 'src\/
                    'wro4j-core/src/main/java/',
                    'wro4j-examples/src/test/java/', 'wro4j-maven-plugin/src/test/java/',
                    'wro4j-extensions/src/test/java/', 'wro4j-test-utils/src/test/java/',
-                   'wro4j-core/src/test/java/', '']
+                   'wro4j-core/src/test/java/', ''],
+         'commons-csv': ['src\/test\/java\/', 'src\/java\/', 'src\/main\/java\/', 'src\/test\/', '']
         }
 
 def format_method(row):
