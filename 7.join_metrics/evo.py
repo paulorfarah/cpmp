@@ -5,14 +5,24 @@ packs = {'commons-bcel': ['examples\/', 'src\/examples\/', 'src\/java\/', 'src\/
                                               'src\/test\/', 'src\/test\/java\/'],
          'commons-io': ['src\/test\/java\/', 'src\/java\/', 'src\/main\/java\/', 'src\/test\/'],
          'junit4': ['src\/test\/java\/', 'src\/java\/', 'src\/main\/java\/', 'src\/test\/', ''],
-         'pdfbox': ['src\/test\/java\/', 'src\/java\/', 'src\/main\/java\/', 'src\/test\/', ''],
+         'pdfbox': ['src\/test\/java\/', 'src\/java\/', 'src\/main\/java\/', 'src\/test\/',
+                    'ant\/src\/main\/java\/', 'examples\/src\/main\/java\/',
+                    'lucene\/src\/main\/java\/', 'preflight\/src\/main\/java\/',
+                    'pdfbox\/src\/main\/java\/', 'jempbox\/src\/main\/java\/',
+                    'xmpbox\/src\/main\/java\/', 'fontbox\/src\/main\/java\/',
+                    'fontbox\/src\/test\/java\/', 'debugger\/src\/main\/java\/',
+                    'tools\/src\/main\/java\/', 'pdfbox\/src\/test\/java\/',
+                    'xmpbox\/src\/test\/java\/', 'examples\/src\/test\/java',
+                    'preflight\/src\/test\/java\/',
+                    ''],
          'wro4j': ['src\/test\/java\/', 'src\/java\/', 'src\/main\/java\/', 'src\/test\/',
                 'wro4j-examples/src/main/java/', 'wro4j-maven-plugin/src/main/java/',
                    'wro4j-extensions/src/main/java/', 'wro4j-test-utils/src/main/java/',
                    'wro4j-core/src/main/java/',
                    'wro4j-examples/src/test/java/', 'wro4j-maven-plugin/src/test/java/',
                    'wro4j-extensions/src/test/java/', 'wro4j-test-utils/src/test/java/',
-                   'wro4j-core/src/test/java/', '']
+                   'wro4j-core/src/test/java/', ''],
+         'commons-csv': ['src\/test\/java\/', 'src\/java\/', 'src\/main\/java\/', 'src\/test\/', '']
     }
 
 
