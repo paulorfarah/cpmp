@@ -67,6 +67,8 @@ if __name__ == "__main__":
                         df_disjoint_right = df_joined_outer.query('_merge == "right_only"')[['method_name','_merge']]
                         if len(evo) and len(df_joined.index):
                             df_joined = pd.merge(left=df_joined, right=evo, on='method_name', how='inner')
+                            if len(df_joined.index) == 0:
+                                print('evo')
 
                             print('all left right left+right inner')
                             print(len(df_joined_outer.index), len(df_disjoint_left.index), len(df_disjoint_right),

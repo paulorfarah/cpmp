@@ -29,7 +29,15 @@ packs = {'commons-bcel': ['examples\/', 'src\/examples\/', 'src\/java\/', 'src\/
                       'test-integration\/src\/main\/java\/', 'test-integration\/src\/test\/java\/',
                       'test-java8\/src\/test\/java\/', 'test-junit5\/src\/test\/java\/', 'test-nodeps\/src\/test\/java\/',
                       'test-osgi\/src\/test\/java\/', 'test-testng\/src\/test\/java\/',
-                      'src\/test\/java\/', 'src\/java\/', 'src\/main\/java\/', 'src\/test\/', '']
+                      'src\/test\/java\/', 'src\/java\/', 'src\/main\/java\/', 'src\/test\/',
+                      'easymock\/src\/samples\/java\/',
+                      'easymock\/bench\/src\/main\/java\/', 'easymock\/core\/src\/main\/java\/', 'easymock\/core\/src\/samples\/java\/',
+                      'easymock\/core\/src\/test\/java\/', 'easymock\/test-android\/src\/main\/java\/', 'easymock\/test-deploy\/src\/main\/java\/',
+                      'easymock\/test-integration\/src\/main\/java\/', 'easymock\/test-integration\/src\/test\/java\/',
+                      'easymock\/test-java8\/src\/test\/java\/', 'easymock\/test-junit5\/src\/test\/java\/', 'easymock\/test-nodeps\/src\/test\/java\/',
+                      'easymock\/test-osgi\/src\/test\/java\/', 'easymock\/test-testng\/src\/test\/java\/',
+                      'easymock\/src\/test\/java\/', 'easymock\/src\/java\/', 'easymock\/src\/main\/java\/', 'easymock\/src\/test\/',
+                      '']
         }
 
 def format_method(row):
