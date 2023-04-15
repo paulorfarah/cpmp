@@ -23,11 +23,13 @@ packs = {'commons-bcel': ['examples\/', 'src\/examples\/', 'src\/java\/', 'src\/
                    'wro4j-extensions\/src\/test\/java\/', 'wro4j-test-utils\/src\/test\/java\/',
                    'wro4j-core\/src\/test\/java\/', ''],
          'commons-csv': ['src\/test\/java\/', 'src\/java\/', 'src\/main\/java\/', 'src\/test\/', ''],
-         'easymock': ['bench\/src\/main\/java\/', 'core\/src\/main\/java\/', 'core\/src\/samples\/java\/',
+         'easymock': ['src\/samples\/java\/',
+                      'bench\/src\/main\/java\/', 'core\/src\/main\/java\/', 'core\/src\/samples\/java\/',
                       'core\/src\/test\/java\/', 'test-android\/src\/main\/java\/', 'test-deploy\/src\/main\/java\/',
                       'test-integration\/src\/main\/java\/', 'test-integration\/src\/test\/java\/',
                       'test-java8\/src\/test\/java\/', 'test-junit5\/src\/test\/java\/', 'test-nodeps\/src\/test\/java\/',
-                      'test-osgi\/src\/test\/java\/', 'test-testng\/src\/test\/java\/', '']
+                      'test-osgi\/src\/test\/java\/', 'test-testng\/src\/test\/java\/',
+                      'src\/test\/java\/', 'src\/java\/', 'src\/main\/java\/', 'src\/test\/', '']
     }
 
 
