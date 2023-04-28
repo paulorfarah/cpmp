@@ -37,7 +37,8 @@ packs = {'commons-bcel': ['examples\/', 'src\/examples\/', 'src\/java\/', 'src\/
                       'easymock\/test-java8\/src\/test\/java\/', 'easymock\/test-junit5\/src\/test\/java\/', 'easymock\/test-nodeps\/src\/test\/java\/',
                       'easymock\/test-osgi\/src\/test\/java\/', 'easymock\/test-testng\/src\/test\/java\/',
                       'easymock\/src\/test\/java\/', 'easymock\/src\/java\/', 'easymock\/src\/main\/java\/', 'easymock\/src\/test\/',
-                      '']
+                      ''],
+         'commons-text': ['src\/test\/java\/', 'src\/main\/java\/']
     }
 
 # easymock.src.samples.java.org.easymock.samples.PartialClassMockTest.setX(int)

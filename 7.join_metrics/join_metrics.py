@@ -14,7 +14,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(description='Join Metrics')
     # args = ap.parse_args()
 
-    projects = ['wro4j']
+    projects = ['commons-text']
     for project_name in projects:
         repo_path = "repos/" + project_name
         gr = pydriller.Git(repo_path)
