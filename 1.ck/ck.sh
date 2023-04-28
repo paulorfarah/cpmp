@@ -25,3 +25,4 @@ mv method.csv results/"${PROJECT_NAME}"/"${PROJECT_NAME}"_"${commit}"_method.csv
 done < $filename
 
 rm -Rf "${PROJECT_NAME}"
+#for f in *;do mv -i "$f" "${f//[\"\'\r[:space:]]}"; done
