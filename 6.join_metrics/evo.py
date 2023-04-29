@@ -38,10 +38,15 @@ packs = {'commons-bcel': ['examples\/', 'src\/examples\/', 'src\/java\/', 'src\/
                       'easymock\/test-osgi\/src\/test\/java\/', 'easymock\/test-testng\/src\/test\/java\/',
                       'easymock\/src\/test\/java\/', 'easymock\/src\/java\/', 'easymock\/src\/main\/java\/', 'easymock\/src\/test\/',
                       ''],
-         'commons-text': ['src\/test\/java\/', 'src\/main\/java\/']
+         'jgit': ['org.eclipse.jgit.ant.test\/', 'org.eclipse.jgit.ant\/', 'org.eclipse.jgit.archive\/', 'org.eclipse.jgit.http.apache\/',
+                    'org.eclipse.jgit.http.server\/', 'org.eclipse.jgit.http.test\/', 'org.eclipse.jgit.junit.http\/', 'org.eclipse.jgit.junit\/',
+                    'org.eclipse.jgit.lfs.server.test\/', 'org.eclipse.jgit.lfs.server\/', 'org.eclipse.jgit.lfs.test\/',
+                    'org.eclipse.jgit.lfs\/', 'org.eclipse.jgit.packaging\/', 'org.eclipse.jgit.pgm.test\/',
+                    'org.eclipse.jgit.pgm\/', 'org.eclipse.jgit.test\/tst\/', 'org.eclipse.jgit.test\/', 'org.eclipse.jgit.ui\/',
+                  'org.eclipse.jgit\/', 'org.eclipse.jgit.src\/', ''],
+         'Openfire': ['src\/java\/', 'src\/test\/java']
     }
 
-# easymock.src.samples.java.org.easymock.samples.PartialClassMockTest.setX(int)
 
 def format_method(row):
     method_name = row['method']
@@ -61,7 +66,7 @@ def format_method(row):
 
 def join_evo(project_name, current_hash):
     # print("evolutive")
-    csv_path = '../5.evometrics/results/' + project_name + '-methods-results-processMetrics.csv'
+    csv_path = '../4.evometrics/results/' + project_name + '-methods-results-processMetrics.csv'
 
     metrics = ['project', 'commit', 'commitprevious', 'release', 'file', 'method', 'BOC', 'TACH', 'FCH', 'LCH', 'CHO',
                'FRCH', 'CHD', 'WCH', 'WCD', 'WFR', 'ATAF', 'LCA', 'LCD', 'CSB', 'CSBS', 'ACDF']

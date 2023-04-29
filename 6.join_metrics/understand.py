@@ -3,14 +3,18 @@ import pandas as pd
 
 def format_method(row):
     method_name = row['Name']
-    m = re.search('\([a-zA-Z0-9\._,\[\]]+\)$', method_name)
+    m = re.search('\([a-zA-Z0-9\._,\[\]<>]+\)$', method_name)
     if m:
         params = []
-        p = re.findall('[a-zA-Z0-9\._\[\]]+,|[a-zA-Z0-9\._\[\]]+\)', m.group(0))
+        p = re.findall('[a-zA-Z0-9\._\[\]<>]+,|[a-zA-Z0-9\._\[\]<>]+\)', m.group(0))
         for param in p:
             last = param.rsplit('.', 1)[-1]
+            tag = re.findall('<[a-zA-Z0-9\._\[\]]+>', last)
+            for t in tag:
+                last = last.replace(t, '')
+
             params.append(last.replace(',', '').replace(')', ''))
-        method_name = re.sub('\([a-zA-Z0-9\._,\[\]]+\)$', '(' + ','.join(params) + ')', method_name)
+        method_name = re.sub('\([a-zA-Z0-9\._,\[\]<>]+\)$', '(' + ','.join(params) + ')', method_name)
     method_name = method_name.replace('$', '.')
     return method_name
 

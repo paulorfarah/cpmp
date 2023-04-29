@@ -37,7 +37,14 @@ packs = {'commons-bcel': ['examples\/', 'src\/examples\/', 'src\/java\/', 'src\/
                       'easymock\/test-java8\/src\/test\/java\/', 'easymock\/test-junit5\/src\/test\/java\/', 'easymock\/test-nodeps\/src\/test\/java\/',
                       'easymock\/test-osgi\/src\/test\/java\/', 'easymock\/test-testng\/src\/test\/java\/',
                       'easymock\/src\/test\/java\/', 'easymock\/src\/java\/', 'easymock\/src\/main\/java\/', 'easymock\/src\/test\/',
-                      '']
+                      ''],
+         'jgit': ['org.eclipse.jgit.ant.test\/', 'org.eclipse.jgit.ant\/', 'org.eclipse.jgit.archive\/', 'org.eclipse.jgit.http.apache\/',
+                    'org.eclipse.jgit.http.server\/', 'org.eclipse.jgit.http.test\/', 'org.eclipse.jgit.junit.http\/', 'org.eclipse.jgit.junit\/',
+                    'org.eclipse.jgit.lfs.server.test\/', 'org.eclipse.jgit.lfs.server\/', 'org.eclipse.jgit.lfs.test\/',
+                    'org.eclipse.jgit.lfs\/', 'org.eclipse.jgit.packaging\/', 'org.eclipse.jgit.pgm.test\/',
+                    'org.eclipse.jgit.pgm\/', 'org.eclipse.jgit.test\/tst\/', 'org.eclipse.jgit.test\/', 'org.eclipse.jgit.ui\/',
+                  'org.eclipse.jgit\/', 'org.eclipse.jgit.src\/', ''],
+        'Openfire': ['src\/java\/', 'src\/test\/java']
         }
 
 def format_method(row):
@@ -58,7 +65,7 @@ def format_method(row):
 
 def join_change_distiller(project_name, current_hash):
     # print("Change distiller")
-    csv_path = '../6.cd/results/' + project_name + '-cd-methods-results.csv'
+    csv_path = '../5.cd/results/' + project_name + '-cd-methods-results.csv'
 
     metrics = ["PROJECT_NAME", "PREVIOUS_COMMIT", "CURRENT_COMMIT", "CLASS_CURRENTCOMMIT", "CLASS_PREVIOUSCOMMIT",
                "CLASS_CURRENTNAME", "CLASS_PREVIOUSNAME",

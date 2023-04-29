@@ -1,5 +1,5 @@
+from mdi import mdi
 from information_gain import information_gain
-
 if __name__ == "__main__":
     projects = ['easymock']
 
@@ -85,4 +85,5 @@ if __name__ == "__main__":
     model3 = structural_metrics + evolutionary_metrics
 
     # for project_name in projects:
+    mdi(projects, main_columns, model3)
     information_gain(projects, main_columns, model3)

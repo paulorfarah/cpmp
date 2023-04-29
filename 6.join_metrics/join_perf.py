@@ -39,7 +39,14 @@ packs = {'commons-bcel': ['examples\/', 'src\/examples\/', 'src\/java\/', 'src\/
                       'easymock\/test-java8\/src\/test\/java\/', 'easymock\/test-junit5\/src\/test\/java\/', 'easymock\/test-nodeps\/src\/test\/java\/',
                       'easymock\/test-osgi\/src\/test\/java\/', 'easymock\/test-testng\/src\/test\/java\/',
                       'easymock\/src\/test\/java\/', 'easymock\/src\/java\/', 'easymock\/src\/main\/java\/', 'easymock\/src\/test\/',
-                      '']
+                      ''],
+         'jgit': ['org.eclipse.jgit.ant.test\/', 'org.eclipse.jgit.ant\/', 'org.eclipse.jgit.archive\/', 'org.eclipse.jgit.http.apache\/',
+                    'org.eclipse.jgit.http.server\/', 'org.eclipse.jgit.http.test\/', 'org.eclipse.jgit.junit.http\/', 'org.eclipse.jgit.junit\/',
+                    'org.eclipse.jgit.lfs.server.test\/', 'org.eclipse.jgit.lfs.server\/', 'org.eclipse.jgit.lfs.test\/',
+                    'org.eclipse.jgit.lfs\/', 'org.eclipse.jgit.packaging\/', 'org.eclipse.jgit.pgm.test\/',
+                    'org.eclipse.jgit.pgm\/', 'org.eclipse.jgit.test\/tst\/', 'org.eclipse.jgit.test\/', 'org.eclipse.jgit.ui\/',
+                  'org.eclipse.jgit\/', 'org.eclipse.jgit.src\/', ''],
+         'Openfire': ['src\/java\/', 'src\/test\/java']
     }
 
 
@@ -85,7 +92,7 @@ def format_method(row):
     # public java.lang.String org.jivesoftware.openfire.IQHandlerInfo.getNamespace()
 
     method_name = row['method_name']
-    patternMethod = r'[a-zA-Z0-9._]+\([a-zA-Z0-9 .,_\[\]]*\)'
+    patternMethod = r'[a-zA-Z0-9._]+\([a-zA-Z0-9 .,_\[\]<>]*\)'
     method = re.search(patternMethod, method_name)
     if method:
         method_name = method[0]
@@ -104,7 +111,7 @@ def format_method(row):
 
 
 
-project_name = 'easymock'
+project_name = 'Openfire'
 df = pd.read_csv('results/' + project_name + '-all-releases.csv')
 df.columns = cols
 

@@ -14,7 +14,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(description='Join Metrics')
     # args = ap.parse_args()
 
-    projects = ['commons-text']
+    projects = ['Openfire']
     for project_name in projects:
         repo_path = "repos/" + project_name
         gr = pydriller.Git(repo_path)
@@ -31,9 +31,12 @@ if __name__ == "__main__":
         #     current_hash = gr.get_commit_from_tag(tag.name).hash
         commits = []
         for tag in tags:
-            hash = gr.get_commit_from_tag(tag.name).hash
-            commit = [tag.name, hash, tag.commit.committed_date]
-            commits.append(commit)
+            try:
+                hash = gr.get_commit_from_tag(tag.name).hash
+                commit = [tag.name, hash, tag.commit.committed_date]
+                commits.append(commit)
+            except:
+                print(tag)
         df = pd.DataFrame(commits, columns=['Tag', 'Hash', 'Commiter_date'])
         df = df.sort_values(by=['Commiter_date', 'Tag'])
 
@@ -65,7 +68,7 @@ if __name__ == "__main__":
                         df_disjoint_right = df_joined_outer.query('_merge == "right_only"')[['method_name','_merge']]
                         if len(evo) and len(df_joined.index):
                             df_joined = pd.merge(left=df_joined, right=evo, on='method_name', how='inner')
-                            print('all left right left+right inner')
+                            print('evo: all left right left+right inner')
                             print(len(df_joined_outer.index), len(df_disjoint_left.index), len(df_disjoint_right),
                                   len(df_disjoint_both.index), len(df_joined))
 
@@ -89,7 +92,7 @@ if __name__ == "__main__":
                                 df_joined = pd.merge(left=df_joined, right=change_distiller,
                                                      on='method_name', how='inner')
 
-                                print('all left right left+right inner')
+                                print('cd: all left right left+right inner')
                                 print(len(df_joined_outer.index), len(df_disjoint_left.index), len(df_disjoint_right),
                                       len(df_disjoint_both.index), len(df_joined))
                                 # listclass.list(String)
@@ -105,7 +108,6 @@ if __name__ == "__main__":
                                         df_joined.to_csv(csv_results, index=False)
                                     else:
                                         df_joined.to_csv(csv_results, mode="a", header=False, index=False)
-
 
                 release += 1
             except Exception as e:
