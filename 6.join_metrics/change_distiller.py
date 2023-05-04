@@ -38,12 +38,23 @@ packs = {'commons-bcel': ['examples\/', 'src\/examples\/', 'src\/java\/', 'src\/
                       'easymock\/test-osgi\/src\/test\/java\/', 'easymock\/test-testng\/src\/test\/java\/',
                       'easymock\/src\/test\/java\/', 'easymock\/src\/java\/', 'easymock\/src\/main\/java\/', 'easymock\/src\/test\/',
                       ''],
-         'jgit': ['org.eclipse.jgit.ant.test\/', 'org.eclipse.jgit.ant\/', 'org.eclipse.jgit.archive\/', 'org.eclipse.jgit.http.apache\/',
-                    'org.eclipse.jgit.http.server\/', 'org.eclipse.jgit.http.test\/', 'org.eclipse.jgit.junit.http\/', 'org.eclipse.jgit.junit\/',
-                    'org.eclipse.jgit.lfs.server.test\/', 'org.eclipse.jgit.lfs.server\/', 'org.eclipse.jgit.lfs.test\/',
-                    'org.eclipse.jgit.lfs\/', 'org.eclipse.jgit.packaging\/', 'org.eclipse.jgit.pgm.test\/',
-                    'org.eclipse.jgit.pgm\/', 'org.eclipse.jgit.test\/tst\/', 'org.eclipse.jgit.test\/', 'org.eclipse.jgit.ui\/',
-                  'org.eclipse.jgit\/', 'org.eclipse.jgit.src\/', ''],
+         'jgit': ['org.eclipse.jgit.ant.test\/tst\/', 'org.eclipse.jgit.ant.test\/src\/', 'org.eclipse.jgit.ant.test\/',
+                  'org.eclipse.jgit.ant\/src\/',
+                  'org.eclipse.jgit.ant\/', 'org.eclipse.jgit.archive\/src\/', 'org.eclipse.jgit.http.apache\/src\/',
+                  'org.eclipse.jgit.http.server\/src\/', 'org.eclipse.jgit.http.server\/',
+                  'org.eclipse.jgit.http.test\/tst\/', 'org.eclipse.jgit.http.test\/src\/',
+                  'org.eclipse.jgit.http.test\/', 'org.eclipse.jgit.junit.http\/src\/', 'org.eclipse.jgit.junit\/src\/',
+                  'org.eclipse.jgit.junit\/',
+                  'org.eclipse.jgit.lfs.server.test\/tst\/', 'org.eclipse.jgit.lfs.server.test\/',
+                  'org.eclipse.jgit.lfs.server\/src\/',
+                  'org.eclipse.jgit.lfs.server\/', 'org.eclipse.jgit.lfs.test\/tst\/', 'org.eclipse.jgit.lfs.test\/src\/',
+                  'org.eclipse.jgit.lfs.test\/',
+                  'org.eclipse.jgit.lfs\/src\/', 'org.eclipse.jgit.lfs\/', 'org.eclipse.jgit.packaging\/',
+                  'org.eclipse.jgit.pgm.test\/tst\/', 'org.eclipse.jgit.pgm.test\/src\/',
+                  'org.eclipse.jgit.pgm\/src\/', 'org.eclipse.jgit.test\/tst\/', 'org.eclipse.jgit.test\/src\/',
+                  'org.eclipse.jgit.test\/exttst', 'org.eclipse.jgit.test\/', 'org.eclipse.jgit.ui\/src\/',
+                  'org.eclipse.jgit\/src\/', 'org.eclipse.jgit\/', 'org.eclipse.jgit.src\/', ''],
+
         'Openfire': ['src\/java\/', 'src\/test\/java']
         }
 
@@ -59,6 +70,7 @@ def format_method(row):
 
     method_name = method_name.replace('.java', '')
     method_name = method_name.replace('/', '.')
+    method_name = method_name.replace(' ', '')
 
     return method_name
 

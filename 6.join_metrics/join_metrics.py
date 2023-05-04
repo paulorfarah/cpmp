@@ -14,15 +14,16 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(description='Join Metrics')
     # args = ap.parse_args()
 
-    projects = ['Openfire']
+    projects = ['jgit']
     for project_name in projects:
         repo_path = "repos/" + project_name
         gr = pydriller.Git(repo_path)
         repo = git.Repo(repo_path)
         tags = repo.tags
         release = 1
+        merge_type = 'inner'
 
-        csv_results = 'results/' + project_name + '-all-releases.csv'
+        csv_results = 'results/' + project_name + '-all-releases-' + merge_type + '.csv'
 
         # f = open(csvPath, "w")
         # writer = csv.writer(f)
@@ -43,6 +44,8 @@ if __name__ == "__main__":
         releases = df['Hash']
         for current_hash in releases:
             print(current_hash)
+            if current_hash.startswith('399'):
+                print('here')
 
             try:
                 df_ck = join_ck(project_name, current_hash)
@@ -57,7 +60,8 @@ if __name__ == "__main__":
                     df_disjoint_right = df_joined_outer.query('_merge == "right_only"')[['method_name', 'Name', '_merge']]
                     df_disjoint_both = df_joined_outer.query('_merge != "both"')[['method_name', 'Name', '_merge']]
                     if len(und.index) and len(df_joined.index):
-                        df_joined = pd.merge(left=df_joined, right=und, on='method_name', how='inner')
+                        # df_joined = pd.merge(left=df_joined, right=und, on='method_name', how='inner')
+                        df_joined = pd.merge(left=df_joined, right=und, on='method_name', how=merge_type)
 
                         # print(len(df_joined_outer.index), len(df_disjoint_left.index), len(df_disjoint_right), len(df_disjoint_both.index), len(df_joined_inner))
                         evo = join_evo(project_name, current_hash)
@@ -67,7 +71,8 @@ if __name__ == "__main__":
                         df_disjoint_left = df_joined_outer.query('_merge == "left_only"')[['method_name', '_merge']]
                         df_disjoint_right = df_joined_outer.query('_merge == "right_only"')[['method_name','_merge']]
                         if len(evo) and len(df_joined.index):
-                            df_joined = pd.merge(left=df_joined, right=evo, on='method_name', how='inner')
+                            # df_joined = pd.merge(left=df_joined, right=evo, on='method_name', how='inner')
+                            df_joined = pd.merge(left=df_joined, right=evo, on='method_name', how=merge_type)
                             print('evo: all left right left+right inner')
                             print(len(df_joined_outer.index), len(df_disjoint_left.index), len(df_disjoint_right),
                                   len(df_disjoint_both.index), len(df_joined))
@@ -89,8 +94,9 @@ if __name__ == "__main__":
                                 df_disjoint_both = df_joined_outer.query('_merge != "both"')[['method_name', '_merge']]
                                 df_disjoint_right = df_joined_outer.query('_merge == "right_only"')[['method_name', '_merge']]
                                 df_disjoint_left = df_joined_outer.query('_merge == "left_only"')[['method_name', '_merge']]
-                                df_joined = pd.merge(left=df_joined, right=change_distiller,
-                                                     on='method_name', how='inner')
+                                # df_joined = pd.merge(left=df_joined, right=change_distiller, on='method_name', how='inner')
+                                df_joined = pd.merge(left=df_joined, right=change_distiller, on='method_name',
+                                                     how=merge_type)
 
                                 print('cd: all left right left+right inner')
                                 print(len(df_joined_outer.index), len(df_disjoint_left.index), len(df_disjoint_right),

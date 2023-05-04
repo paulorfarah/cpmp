@@ -15,7 +15,8 @@ def weka_tokenizer(doc):
 def information_gain(databases, main_columns, feature_names):
     for db in databases:
         all_releases_df = pd.read_csv(
-            '../6.join_metrics/results/' + db + '-all-releases.csv', usecols=main_columns)
+            '../6.join_metrics/results/' + db + '-all-releases.csv')#, usecols=main_columns)
+        all_releases_df.columns = main_columns
         all_releases_df = all_releases_df.fillna(0)
 
         total_data_X = np.array(all_releases_df[feature_names].copy())

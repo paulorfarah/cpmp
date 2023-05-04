@@ -111,7 +111,7 @@ def format_method(row):
 
 
 
-project_name = 'Openfire'
+project_name = 'jgit'
 df = pd.read_csv('results/' + project_name + '-all-releases.csv')
 df.columns = cols
 

@@ -345,7 +345,7 @@ if __name__ == '__main__':
     model3 = evolutionary_metrics
 
     # datasets = ['commons-bcel','commons-io','junit4','pdfbox','wro4j']
-    datasets = ['easymock']
+    datasets = ['jgit']
 
     main_columns = [
         # ck
@@ -406,7 +406,7 @@ if __name__ == '__main__':
             for rs in resamples:
                 for model in models:
                     all_releases_df = pd.read_csv(
-                        '../7.join_metrics/results/' + dataset + '-perf-diff-all.csv')
+                        '../6.join_metrics/results/' + dataset + '-perf-diff-all.csv')
 
                     all_releases_df = all_releases_df.fillna(0)
                     # all_releases_df.columns = main_columns
