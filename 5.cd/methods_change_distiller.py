@@ -38,10 +38,13 @@ def compare_classes(java, pathA, pathB, currentCommit, previousCommit):
     csvPath = absolute_path + 'results/' + args.project_name + "-cd-methods-results.csv"
     try:
         f = open(csvPath, "x")
-    except:
+    except FileExistsError:
+        print('File already exists: ' + csvPath)
         # print("file exists")
         print(sys.exc_info())
     for file in filesA:
+        if currentCommit.startswith('0fa751') and 'InstConstraintVisitor' in file:
+            print('aqui2')
         file_temp = file.replace(absolute_path + "projectA", '')
         if any(file_temp in s for s in filesB):
             file2 = absolute_path + "projectB" + file_temp
@@ -63,14 +66,18 @@ def compare_classes(java, pathA, pathB, currentCommit, previousCommit):
                 if method_files_A:
                     print('[>>>FileNotFound]: ' + methods_path_A + '! \n Check if class has methods...')
                 else:
-                    print(sys.exc_info())
+                    print('Error ind method_filesA: ' + str(sys.exc_info()))
+            except:
+                print('error reading files A: ' + str(sys.exc_info()))
             try:
                 method_files_B = [f for f in listdir(methods_path_B) if isfile(join(methods_path_B, f))]
             except FileNotFoundError:
                 if method_files_B:
                     print('[>>>FileNotFound]: ' + methods_path_B + '! \n Check if class has methods...')
                 else:
-                    print(sys.exc_info())
+                    print('Error ind method_filesB: ' + str(sys.exc_info()))
+            except:
+                print('error reading files B: ' + str(sys.exc_info()))
 
             if method_files_A and method_files_B:
                 for method_file in method_files_A:
