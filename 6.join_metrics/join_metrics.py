@@ -14,7 +14,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(description='Join Metrics')
     # args = ap.parse_args()
 
-    projects = ['jgit']
+    projects = ['Openfire']
     for project_name in projects:
         repo_path = "repos/" + project_name
         gr = pydriller.Git(repo_path)
@@ -34,8 +34,11 @@ if __name__ == "__main__":
         for tag in tags:
             try:
                 hash = gr.get_commit_from_tag(tag.name).hash
+
+                # if hash == '0bde7625668738bdee0e48f5fcb821ed91a71ec2': #retirar essa linha
                 commit = [tag.name, hash, tag.commit.committed_date]
                 commits.append(commit)
+
             except:
                 print(tag)
         df = pd.DataFrame(commits, columns=['Tag', 'Hash', 'Commiter_date'])
@@ -44,12 +47,12 @@ if __name__ == "__main__":
         releases = df['Hash']
         for current_hash in releases:
             print(current_hash)
-            if current_hash.startswith('399'):
-                print('here')
+            # if current_hash.startswith('c0f26'):
+            #     print('here')
 
             try:
                 df_ck = join_ck(project_name, current_hash)
-                if len(df_ck):
+                if len(df_ck.index):
                     df_joined = df_ck
                     df_joined['commit'] = current_hash
 
@@ -70,7 +73,7 @@ if __name__ == "__main__":
                         df_disjoint_both = df_joined_outer.query('_merge != "both"')[['method_name', '_merge']]
                         df_disjoint_left = df_joined_outer.query('_merge == "left_only"')[['method_name', '_merge']]
                         df_disjoint_right = df_joined_outer.query('_merge == "right_only"')[['method_name','_merge']]
-                        if len(evo) and len(df_joined.index):
+                        if len(evo.index) and len(df_joined.index):
                             # df_joined = pd.merge(left=df_joined, right=evo, on='method_name', how='inner')
                             df_joined = pd.merge(left=df_joined, right=evo, on='method_name', how=merge_type)
                             print('evo: all left right left+right inner')

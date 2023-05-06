@@ -55,12 +55,45 @@ packs = {'commons-bcel': ['examples\/', 'src\/examples\/', 'src\/java\/', 'src\/
                   'org.eclipse.jgit.test\/exttst', 'org.eclipse.jgit.test\/', 'org.eclipse.jgit.ui\/src\/',
                   'org.eclipse.jgit\/src\/', 'org.eclipse.jgit\/', 'org.eclipse.jgit.src\/', ''],
 
-# /org.eclipse.jgit.http.server/src/
-# /org.eclipse.jgit.http.server/src/org/eclipse/jgit/http/server/GitFilter/getBoolean(FilterConfig, String)
-# /org.eclipse.jgit/src/org/eclipse/jgit/diff/MyersDiff/newSnake(int, int)
-# /org.eclipse.jgit.lfs/src/
-
-         'Openfire': ['src\/java\/', 'src\/test\/java']
+         'Openfire': [
+             'starter\/src\/main\/java\/', 'xmppserver\/src\/main\/java\/',
+             'xmppserver\/src\/test\/throttletest\/src\/',
+             'xmppserver\/src\/test\/java\/',
+             'plugins\/tikitoken\/src\/java\/',
+             'plugins\/sip\/src\/java\/',
+             'plugins\/loadStats\/src\/java\/',
+             'plugins\/nonSaslAuthentication\/src\/java\/',
+             'plugins\/xmldebugger\/src\/java\/',
+             'plugins\/mucservice\/src\/java\/',
+             'plugins\/emailListener\/src\/java\/',
+             'plugins\/inverse\/src\/java\/',
+             'plugins\/userImportExport\/src\/test\/java\/',
+             'plugins\/registration\/src\/java\/',
+             'plugins\/justmarried\/src\/java\/',
+             'plugins\/monitoring\/src\/java\/',
+             'plugins\/clientControl\/src\/java\/',
+             'plugins\/externalservicediscovery\/src\/test\/',
+             'plugins\/dbaccess\/src\/java\/',
+             'plugins\/restAPI\/src\/java\/',
+             'plugins\/contentFilter\/src\/test\/java\/',
+             'plugins\/hazelcast\/src\/java\/',
+             'plugins\/candy\/src\/java\/',
+             'plugins\/fastpath\/src\/java\/',
+             'plugins\/certificateManager\/src\/java\/',
+             'plugins\/httpFileUpload\/src\/java\/',
+             'plugins\/subscription\/src\/java\/',
+             'plugins\/packetFilter\/src\/java\/',
+             'plugins\/presence\/src\/java\/',
+             'plugins\/bookmarks\/src\/java\/',
+             'plugins\/broadcast\/src\/java\/',
+             'plugins\/userservice\/src\/java\/',
+             'plugins\/motd\/src\/java\/',
+             'plugins\/userCreation\/src\/java\/',
+             'plugins\/gojara\/src\/java\/',
+             'plugins\/stunserver\/src\/java\/',
+             'plugins\/userStatus\/src\/java\/',
+             'plugins\/search\/src\/java\/',
+             'src\/java\/', 'src\/test\/java\/']
     }
 
 
@@ -84,7 +117,7 @@ def join_evo(project_name, current_hash):
     # print("evolutive")
     csv_path = '../4.evometrics/results/' + project_name + '-methods-results-processMetrics.csv'
 
-    metrics = ['project', 'commit', 'commitprevious', 'release', 'file', 'method', 'BOC', 'TACH', 'FCH', 'LCH', 'CHO',
+    metrics = ['project', 'commit', 'commitprevious', 'release', 'file', 'method', 'BOM', 'TACH', 'FCH', 'LCH', 'CHO',
                'FRCH', 'CHD', 'WCH', 'WCD', 'WFR', 'ATAF', 'LCA', 'LCD', 'CSB', 'CSBS', 'ACDF']
 
     df = pd.read_csv(csv_path, usecols=metrics, sep=',', engine='python', index_col=False)
