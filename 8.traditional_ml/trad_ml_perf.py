@@ -16,7 +16,7 @@ from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKF
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.tree import DecisionTreeClassifier
-
+from sklearn.model_selection import RandomizedSearchCV
 
 def generateStandardTimeSeriesStructure(all_releases_df, ws, featureList):
     print("Generating a new dataframe without containing the last release...")
@@ -94,15 +94,21 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws):
     scores.append(accuracy_score(y_test, y_pred, normalize=True))
     print("Accuracy: " + str(scores[-1]))
 
-    # Sensitivity
+    # precision
+    precision = tp/ (tp + fp)
+    scores.append(precision)
+
+    # Sensitivity / recall
     sensitivity = tp / (tp + fn)
     scores.append(sensitivity)
     print("Sensitivity: " + str(scores[-1]))
+
 
     # Specificity
     specificity = tn / (tn + fp)
     scores.append(specificity)
     print("Specificity: " + str(scores[-1]))
+
 
     # Confusion Matrix
     cnf_matrix = confusion_matrix(y_test, y_pred)
@@ -116,7 +122,7 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws):
 
     scores.append([tn, fp, fn, tp])
     head = ['Dataset', 'Algoritm', 'window', 'model', 'resample', 'F1-Score(micro)', 'F1-Score(macro)',
-            'F1-Score(weighted)', 'F1-Score(None)', 'Accuracy', 'Sensitivity', 'Specificity', 'ROC AUC score',
+            'F1-Score(weighted)', 'F1-Score(None)', 'Accuracy', 'precision', 'Sensitivity', 'Specificity', 'ROC AUC score',
             'Confusion matrix']
 
     if not os.path.exists('results/' + dataset + 'results-tradicional-no-feature-selection-model1-3-perf.csv'):
@@ -226,9 +232,36 @@ def RandomForest_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
         ytr_RF, yvl_RF = Ytrain.iloc[train_index], Ytrain.iloc[test_index]
 
         # model
-        rf = RandomForestClassifier(random_state=42, class_weight='balanced', n_estimators=100, n_jobs=-1)
-        rf.fit(xtr_RF, ytr_RF.values.ravel())
-        score = roc_auc_score(yvl_RF, rf.predict(xvl_RF))
+        # rf = RandomForestClassifier(random_state=42, class_weight='balanced', n_estimators=100, n_jobs=-1)
+        # rf.fit(xtr_RF, ytr_RF.values.ravel())
+        rf = RandomForestClassifier()
+        # Number of trees in random forest
+        n_estimators = [int(x) for x in np.linspace(start=200, stop=2000, num=10)]
+        # Number of features to consider at every split
+        max_features = ['auto', 'sqrt']
+        # Maximum number of levels in tree
+        max_depth = [int(x) for x in np.linspace(10, 110, num=11)]
+        max_depth.append(None)
+        # Minimum number of samples required to split a node
+        min_samples_split = [2, 5, 10]
+        # Minimum number of samples required at each leaf node
+        min_samples_leaf = [1, 2, 4]
+        # Method of selecting samples for training each tree
+        bootstrap = [True, False]
+        # Create the random grid
+        random_grid = {'n_estimators': n_estimators,
+                       'max_features': max_features,
+                       'max_depth': max_depth,
+                       'min_samples_split': min_samples_split,
+                       'min_samples_leaf': min_samples_leaf,
+                       'bootstrap': bootstrap}
+
+        rf_random = RandomizedSearchCV(estimator=rf, param_distributions=random_grid, n_iter=100, cv=3, verbose=2,
+                                       random_state=42, n_jobs=-1)
+        # Fit the random search model
+        rf_random.fit(xtr_RF, ytr_RF.values.ravel())
+
+        score = roc_auc_score(yvl_RF, rf_random.predict(xvl_RF))
         print('ROC AUC score:', score)
         cv_score.append(score)
         i += 1
@@ -238,7 +271,7 @@ def RandomForest_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     print('Std deviation: ' + str(np.std(cv_score)))
 
     print("\nTEST SET:")
-    get_scores(Ytest, rf.predict(Xtest), dataset, "RandomForest", rs, model, ws)
+    get_scores(Ytest, rf_random.predict(Xtest), dataset, "RandomForest", rs, model, ws)
 
 
 def NN_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
@@ -331,7 +364,7 @@ if __name__ == '__main__':
                           "MaxInheritanceTree", "MaxNesting", "PercentLackOfCohesion", "RatioCommentToCode",
                           "SumCyclomatic", "SumCyclomaticModified", "SumCyclomaticStrict", "SumEssential"]
     evolutionary_metrics = [
-        'BOM', 'TACH', 'FCH', 'LCH', 'CHO', 'FRCH', 'CHD', 'WCH', 'WCD', 'WFR', 'ATAF', 'LCA', 'LCD', 'CSB', 'CSBS',
+        'BOC', 'TACH', 'FCH', 'LCH', 'CHO', 'FRCH', 'CHD', 'WCH', 'WCD', 'WFR', 'ATAF', 'LCA', 'LCD', 'CSB', 'CSBS',
         'ACDF',
     ]
     change_distiller_metrics = [
@@ -341,12 +374,12 @@ if __name__ == '__main__':
 
 
     model1 = structural_metrics
-    model2 = structural_metrics + evolutionary_metrics
-    model3 = evolutionary_metrics
+    model2 = evolutionary_metrics
+    model3 = structural_metrics + evolutionary_metrics
 
     # datasets = ['commons-bcel','commons-io','junit4','pdfbox','wro4j']
-    datasets = ['jgit']
-
+    # datasets = ['all']
+    datasets = ['easymock']
     main_columns = [
         # ck
         'file', 'class', 'method', 'constructor', 'line', 'cbo', 'cboModified', 'fanin', 'fanout', 'wmc',
@@ -405,9 +438,18 @@ if __name__ == '__main__':
         for ws in windowsize:
             for rs in resamples:
                 for model in models:
+
+                    #to run all datasets
+                    # df1 = pd.read_csv(
+                    #     '../6.join_metrics/results/commons-csv-perf-diff-all.csv')
+                    # df2= pd.read_csv(
+                    #     '../6.join_metrics/results/easymock-perf-diff-all.csv')
+                    # df_row = pd.concat([df1, df2])
+
+                    # all_releases_df = df_row.fillna(0)
+
                     all_releases_df = pd.read_csv(
                         '../6.join_metrics/results/' + dataset + '-perf-diff-all.csv')
-
                     all_releases_df = all_releases_df.fillna(0)
                     # all_releases_df.columns = main_columns
                     # x_raw = all_releases_df[model.get('value')]
@@ -443,7 +485,7 @@ if __name__ == '__main__':
                     print("X Train set:",
                           X_train.shape[0], "X Test set:", X_test.shape[0])
                     print("y Train set:",
-                          y_train.shape[0], "y Test set:", y_test.shape[0])
+                          y_train.shape[0], "y Test set:", y_test.shape)
                     print("... DONE!")
 
                     print("Scaling features...")

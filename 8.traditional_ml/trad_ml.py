@@ -404,7 +404,7 @@ if __name__ == '__main__':
             for rs in resamples:
                 for model in models:
                     all_releases_df = pd.read_csv(
-                        '../7.join_metrics/results/' + dataset + '-all-releases.csv')
+                        '../6.join_metrics/results/' + dataset + '-all-releases.csv')
 
                     all_releases_df = all_releases_df.fillna(0)
                     all_releases_df.columns = main_columns
