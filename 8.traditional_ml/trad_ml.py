@@ -344,7 +344,8 @@ if __name__ == '__main__':
     model3 = evolutionary_metrics
 
     # datasets = ['commons-bcel','commons-io','junit4','pdfbox','wro4j']
-    datasets = ['easymock']
+    dataset_list = ['commons-bcel', 'commons-csv', 'commons-io', 'easymock', 'jgit', 'junit4', 'pdfbox', 'wro4j']
+    datasets = ['junit4']
 
     main_columns = [
         # ck
@@ -373,7 +374,7 @@ if __name__ == '__main__':
 
         # evometrics
         'project', 'commit',
-        'commitprevious', 'release', 'file', 'method', 'BOC', 'TACH', 'FCH', 'LCH', 'CHO',
+        'commitprevious', 'release', 'file', 'method', 'BOM', 'TACH', 'FCH', 'LCH', 'CHO',
         'FRCH', 'CHD', 'WCH', 'WCD', 'WFR', 'ATAF', 'LCA', 'LCD', 'CSB', 'CSBS', 'ACDF',
         # change distiller
         "PROJECT_NAME", "PREVIOUS_COMMIT", "CURRENT_COMMIT", "CLASS_CURRENTCOMMIT", "CLASS_PREVIOUSCOMMIT",
@@ -403,8 +404,13 @@ if __name__ == '__main__':
         for ws in windowsize:
             for rs in resamples:
                 for model in models:
-                    all_releases_df = pd.read_csv(
-                        '../6.join_metrics/results/' + dataset + '-all-releases.csv')
+                    if dataset == 'all':
+                        dfs = []
+                        for ds_name in dataset_list:
+                            dfs.append(pd.read_csv('../6.join_metrics/results/' + ds_name + '-all-releases.csv'))
+                        all_releases_df = pd.concat(dfs)
+                    else:
+                        all_releases_df = pd.read_csv('../6.join_metrics/results/' + dataset + '-all-releases.csv')
 
                     all_releases_df = all_releases_df.fillna(0)
                     all_releases_df.columns = main_columns
