@@ -119,13 +119,13 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws):
             'F1-Score(weighted)', 'F1-Score(None)', 'Accuracy', 'Sensitivity', 'Specificity', 'ROC AUC score',
             'Confusion matrix']
 
-    if not os.path.exists('results/results-tradicional-no-feature-selection-model1-3.csv'):
-        f = open("results/results-tradicional-no-feature-selection-model1-3.csv", "a")
+    if not os.path.exists('results/' + dataset + '-results-tradicional-no-feature-selection-model1-3.csv'):
+        f = open("results/" + dataset + "-results-tradicional-no-feature-selection-model1-3.csv", "a")
         writer = csv.writer(f)
         writer.writerow(head)
         f.close()
 
-    f = open("results/results-tradicional-no-feature-selection-model1-3.csv", "a")
+    f = open("results/" + dataset + "results-tradicional-no-feature-selection-model1-3.csv", "a")
     writer = csv.writer(f)
     writer.writerow(scores)
     f.close()
@@ -345,7 +345,7 @@ if __name__ == '__main__':
 
     # datasets = ['commons-bcel','commons-io','junit4','pdfbox','wro4j']
     dataset_list = ['commons-bcel', 'commons-csv', 'commons-io', 'easymock', 'jgit', 'junit4', 'pdfbox', 'wro4j']
-    datasets = ['junit4']
+    datasets = ['wro4j']
 
     main_columns = [
         # ck
