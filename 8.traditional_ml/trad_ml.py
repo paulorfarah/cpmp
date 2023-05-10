@@ -119,13 +119,13 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws):
             'F1-Score(weighted)', 'F1-Score(None)', 'Accuracy', 'Sensitivity', 'Specificity', 'ROC AUC score',
             'Confusion matrix']
 
-    if not os.path.exists('results/' + dataset + '-results-tradicional-no-feature-selection-model1-3.csv'):
-        f = open("results/" + dataset + "-results-tradicional-no-feature-selection-model1-3.csv", "a")
+    if not os.path.exists('results/cpmp/' + dataset + '-results-tradicional-no-feature-selection-model1-3.csv'):
+        f = open("results/cpmp/" + dataset + "-results-tradicional-no-feature-selection-model1-3.csv", "a")
         writer = csv.writer(f)
         writer.writerow(head)
         f.close()
 
-    f = open("results/" + dataset + "results-tradicional-no-feature-selection-model1-3.csv", "a")
+    f = open("results/cpmp/" + dataset + "-results-tradicional-no-feature-selection-model1-3.csv", "a")
     writer = csv.writer(f)
     writer.writerow(scores)
     f.close()
@@ -166,7 +166,7 @@ def plot_confusion_matrix(cm, dataset,
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
     plt.tight_layout()
-    plt.savefig('results/cf-' + dataset + '.png')
+    plt.savefig('results/cpmp/cf-' + dataset + '.png')
     plt.close()
 
 
@@ -345,7 +345,7 @@ if __name__ == '__main__':
 
     # datasets = ['commons-bcel','commons-io','junit4','pdfbox','wro4j']
     dataset_list = ['commons-bcel', 'commons-csv', 'commons-io', 'easymock', 'jgit', 'junit4', 'pdfbox', 'wro4j']
-    datasets = ['wro4j']
+    datasets = ['easymock', 'pdfbox', 'wro4j']
 
     main_columns = [
         # ck
@@ -395,7 +395,8 @@ if __name__ == '__main__':
 
     # resamples= ['NONE','RUS','ENN','TL','ROS','SMOTE','ADA']
     # resamples= ['RUS','ENN','TL','ROS','SMOTE','ADA']
-    resamples = ['NONE', 'ROS', 'SMOTE', 'ADA']
+    # resamples = ['NONE', 'ROS', 'SMOTE', 'ADA']
+    resamples = ['RUS', 'ENN', 'TL']
     windowsize = [0]
     models = [{'key': 'model1', 'value': model1}, {'key': 'model2', 'value': model2},
               {'key': 'model3', 'value': model3}]
@@ -480,14 +481,15 @@ if __name__ == '__main__':
                         LogisticRegr_(X_RUS, y_RUS, X_test, y_test, dataset, rs, model.get('key'), ws)
                         NN_(X_RUS, y_RUS, X_test, y_test, dataset, rs, model.get('key'), ws)
                     if rs == 'ENN':
-                        X_ENN, y_ENN = EditedNearestNeighbours(random_state=42).fit_resample(X_train,
-                                                                                             y_train.values.ravel())
+                        X_ENN, y_ENN = EditedNearestNeighbours().fit_resample(X_train, y_train.values.ravel())
+                        y_ENN = df = pd.DataFrame(y_ENN)
                         RandomForest_(X_ENN, y_ENN, X_test, y_test, dataset, rs, model.get('key'), ws)
                         DecisionTree_(X_ENN, y_ENN, X_test, y_test, dataset, rs, model.get('key'), ws)
                         LogisticRegr_(X_ENN, y_ENN, X_test, y_test, dataset, rs, model.get('key'), ws)
                         NN_(X_ENN, y_ENN, X_test, y_test, dataset, rs, model.get('key'), ws)
                     if rs == 'TL':
-                        X_TL, y_TL = TomekLinks(random_state=42).fit_resample(X_train, y_train.values.ravel())
+                        X_TL, y_TL = TomekLinks(n_jobs=-1).fit_resample(X_train, y_train.values.ravel())
+                        y_TL = df = pd.DataFrame(y_TL)
                         RandomForest_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
                         DecisionTree_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
                         LogisticRegr_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
