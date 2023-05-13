@@ -12,7 +12,10 @@ def weka_tokenizer(doc):
     # delimiters_regexp = re.compile("[ -\/:-@\[-\`{-~|0-9|\n|\f|\r|\t|\s]")
     return list(filter(None, delimiters_regexp.split(doc)))
 
-def information_gain(databases, main_columns, feature_names):
+def plot_ranking():
+    print('todo')
+
+def information_gain_cpmp(databases, main_columns, feature_names):
     for db in databases:
         all_releases_df = pd.read_csv(
             '../6.join_metrics/results/' + db + '-all-releases.csv')#, usecols=main_columns)
@@ -25,7 +28,7 @@ def information_gain(databases, main_columns, feature_names):
         encoder = ce.LeaveOneOutEncoder(return_df=True)
         X = encoder.fit_transform(total_data_X, total_data_Y)
 
-        selector = SelectKBest(mutual_info_classif, k=20)
+        selector = SelectKBest(mutual_info_classif, k=10)
         X_reduced = selector.fit_transform(X, total_data_Y)
         print(X_reduced.shape)
 
@@ -49,7 +52,7 @@ def information_gain(databases, main_columns, feature_names):
 
         infGainCSV = pd.DataFrame(sortedInformationGainPosition,
                                   columns=['position', 'metric', 'information_gain', 'total_ocurences'])
-        infGainCSV.to_csv('results/information_gain_' + db + '.csv')
+        infGainCSV.to_csv('results/cpmp/information_gain_' + db + '.csv')
 
         cols = selector.get_support(indices=True)
         selected_columns = X.iloc[:, cols].columns.tolist()

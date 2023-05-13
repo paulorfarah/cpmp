@@ -94,6 +94,10 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws):
     scores.append(accuracy_score(y_test, y_pred, normalize=True))
     print("Accuracy: " + str(scores[-1]))
 
+    # precision
+    precision = tp/ (tp + fp)
+    scores.append(precision)
+
     # Sensitivity
     sensitivity = tp / (tp + fn)
     scores.append(sensitivity)
@@ -116,7 +120,7 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws):
 
     scores.append([tn, fp, fn, tp])
     head = ['Dataset', 'Algoritm', 'window', 'model', 'resample', 'F1-Score(micro)', 'F1-Score(macro)',
-            'F1-Score(weighted)', 'F1-Score(None)', 'Accuracy', 'Sensitivity', 'Specificity', 'ROC AUC score',
+            'F1-Score(weighted)', 'F1-Score(None)', 'Accuracy', 'precision', 'Sensitivity', 'Specificity', 'ROC AUC score',
             'Confusion matrix']
 
     if not os.path.exists('results/cpmp/' + dataset + '-results-tradicional-no-feature-selection-model1-3.csv'):

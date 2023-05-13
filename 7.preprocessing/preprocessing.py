@@ -1,7 +1,9 @@
 from mdi import mdi
-from information_gain import information_gain
+from information_gain import information_gain_cpmp
+
+
 if __name__ == "__main__":
-    projects = ['commons-csv']
+    projects = ['commons-bcel', 'commons-csv', 'commons-io', 'easymock', 'Openfire', 'pdfbox', 'wro4j']
 
     main_columns = [
         # ck
@@ -81,9 +83,9 @@ if __name__ == "__main__":
     ]
 
     model1 = structural_metrics
-    model2 = evolutionary_metrics
-    model3 = structural_metrics + evolutionary_metrics
+    model2 = structural_metrics + evolutionary_metrics
+    model3 = evolutionary_metrics
 
     # for project_name in projects:
     # mdi(projects, main_columns, model3)
-    information_gain(projects, main_columns, model3)
+    information_gain_cpmp(projects, main_columns, model3)
