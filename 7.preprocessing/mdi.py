@@ -35,14 +35,16 @@ import csv
 def mdi(databases, main_columns, feature_names):
     # databases = ['commons-bcel', 'commons-io', 'junit4', 'pdfbox', 'wro4j']
     class_red_type = 'etc_select'
+    res = pd.DataFrame()
     for db in databases:
 
         all_releases_df = pd.read_csv(
             '../6.join_metrics/results/' + db + '-all-releases.csv')#, usecols=main_columns)
         all_releases_df.columns = main_columns
         all_releases_df = all_releases_df.fillna(0)
+        df_filt = all_releases_df[feature_names]
 
-        total_data_X = np.array(all_releases_df[feature_names].copy())
+        total_data_X = np.array(df_filt.copy())
         total_data_Y = np.array(pd.DataFrame(all_releases_df.loc[:, 'will_change']))
 
         skf = StratifiedKFold(n_splits=10)
@@ -116,12 +118,20 @@ def mdi(databases, main_columns, feature_names):
         std = [np.std(fi_list[fn]) for fn in feature_names]
 
         top_features = np.array(feature_names)[np.argsort(importances)[-20:][::-1]]
-        print(f"{db}: {top_features}")
+
+        # print(f"{db}: {top_features}")
+        df = pd.DataFrame()
+        df['metric'] = feature_names
+        df['mdi'] = importances
+        df.set_index('metric', inplace=True, drop=False)
+        df['rank'] = df['mdi'].rank(method='dense', ascending=False)
+        df['application'] = db
+        res = pd.concat([res, df])
         top_features_csv = []
         top_features_csv.append(db)
         for tf in top_features:
             top_features_csv.append(tf)
-        f = open("results/" + db + "-top-features.csv", "a")
+        f = open("results/cpmp/" + db + "-top-features.csv", "a")
         writer = csv.writer(f)
         writer.writerow(top_features_csv)
         f.close()
@@ -137,3 +147,4 @@ def mdi(databases, main_columns, feature_names):
         ax.set_ylabel("Mean decrease in impurity - MDI")
         fig.tight_layout()
         fig.savefig(f'results/f_import_{db}.pdf')
+    return res

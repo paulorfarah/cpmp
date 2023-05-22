@@ -5,8 +5,24 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 
+def resampling_results():
+    datasets = ['commons-bcel', 'commons-csv', 'commons-io', 'easymock', 'Openfire', 'pdfbox', 'wro4j']
+    # algs = ['DT', 'LogisticRegression', 'MLP', 'RandomForest']
+    # models = ['model1', 'model2', 'model3']
+    res = pd.DataFrame(columns=['resample', 'F1-Score(None)', 'Accuracy', 'Sensitivity', 'ROC AUC score'])
+    for dataset in datasets:
+        df = pd.read_csv('results/cpmp/' + dataset + '-results-tradicional-no-feature-selection-model1-3.csv')
+        df['F1-Score(None)'] = df['F1-Score(None)'].values[0].split(' ', 1)[0].replace('[', '')
+        res = pd.concat([res, df[['resample', 'F1-Score(None)', 'Accuracy', 'Sensitivity', 'ROC AUC score']]])
+    res.columns = ['resample', 'F1-Score', 'Accuracy', 'Sensitivity', 'AUC']
+    res.sort_values(by=['resample'])
+    res.to_csv('results/resampling.csv', index=False)
+
+def best_resampling_results():
+    df = pd.read_csv('results/cpmp/best_auc.csv')
+
 def best_scores():
-    datasets = ['commons-bcel', 'commons-csv', 'commons-io', 'easymock', 'jgit', 'Openfire', 'pdfbox', 'wro4j']
+    datasets = ['commons-bcel', 'commons-csv', 'commons-io', 'easymock', 'Openfire', 'pdfbox', 'wro4j']
     algs = ['DT', 'LogisticRegression', 'MLP', 'RandomForest']
     models = ['model1', 'model2', 'model3']
     scores = pd.DataFrame(columns=['AP', 'MS', 'F1', 'Acc', 'Sen', 'AUC', 'RS', 'F1', 'Acc', 'Sen', 'AUC', 'RS'
@@ -73,7 +89,7 @@ def plot_boxplot_best_auc():
 
 
 def concatenate_datasets(col1, col2):
-    datasets = ['commons-bcel', 'commons-csv', 'commons-io', 'easymock', 'jgit', 'Openfire', 'pdfbox', 'wro4j']
+    datasets = ['commons-bcel', 'commons-csv', 'commons-io', 'easymock', 'Openfire', 'pdfbox', 'wro4j']
     algs = ['DT', 'LogisticRegression', 'MLP', 'RandomForest']
     models = ['model1', 'model2', 'model3']
     scores = pd.DataFrame(columns=['AP', 'MS', 'F1', 'Acc', 'Sen', 'AUC', 'RS', 'F1', 'Acc', 'Sen', 'AUC', 'RS'
@@ -110,8 +126,11 @@ def plot_boxplot_all():
             plt.savefig('results/charts/' + col1 + '-' + col2 + '-boxplot.png')
             plt.close()
 
+def plot_metrics():
+
 
 if __name__ == '__main__':
     # best_scores()
     # plot_boxplot_best_auc()
-    plot_boxplot_all()
+    # plot_boxplot_all()
+    resampling_results()

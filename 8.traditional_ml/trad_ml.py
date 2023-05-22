@@ -349,7 +349,7 @@ if __name__ == '__main__':
 
     # datasets = ['commons-bcel','commons-io','junit4','pdfbox','wro4j']
     dataset_list = ['commons-bcel', 'commons-csv', 'commons-io', 'easymock', 'jgit', 'junit4', 'pdfbox', 'wro4j']
-    datasets = ['easymock', 'pdfbox', 'wro4j']
+    datasets = ['jgit']
 
     main_columns = [
         # ck
@@ -399,8 +399,8 @@ if __name__ == '__main__':
 
     # resamples= ['NONE','RUS','ENN','TL','ROS','SMOTE','ADA']
     # resamples= ['RUS','ENN','TL','ROS','SMOTE','ADA']
-    # resamples = ['NONE', 'ROS', 'SMOTE', 'ADA']
-    resamples = ['RUS', 'ENN', 'TL']
+    resamples = ['NONE', 'ROS', 'SMOTE', 'ADA']
+    # resamples = ['RUS', 'ENN', 'TL']
     windowsize = [0]
     models = [{'key': 'model1', 'value': model1}, {'key': 'model2', 'value': model2},
               {'key': 'model3', 'value': model3}]

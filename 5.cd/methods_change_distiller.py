@@ -43,8 +43,6 @@ def compare_classes(java, pathA, pathB, currentCommit, previousCommit):
         # print("file exists")
         print(sys.exc_info())
     for file in filesA:
-        if currentCommit.startswith('0fa751') and 'InstConstraintVisitor' in file:
-            print('aqui2')
         file_temp = file.replace(absolute_path + "projectA", '')
         if any(file_temp in s for s in filesB):
             file2 = absolute_path + "projectB" + file_temp
