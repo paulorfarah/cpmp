@@ -366,7 +366,7 @@ def AdaBoost_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
         ytr_AB, yvl_AB = Ytrain.iloc[train_index], Ytrain.iloc[test_index]
 
         # model
-        abc = AdaBoostClassifier(estimator=svc)
+        abc = AdaBoostClassifier(base_estimator=svc)
         grid = GridSearchCV(abc, parameters, n_jobs=-1, verbose=0)
 
         grid.fit(xtr_AB, ytr_AB.values.ravel())
@@ -426,7 +426,7 @@ if __name__ == '__main__':
 
     # datasets = ['commons-bcel','commons-io','junit4','pdfbox','wro4j']
     # datasets = ['all']
-    datasets = ['jgit']
+    datasets = ['commons-csv']
     main_columns = [
         # ck
         'file', 'class', 'method', 'constructor', 'line', 'cbo', 'cboModified', 'fanin', 'fanout', 'wmc',
@@ -556,7 +556,7 @@ if __name__ == '__main__':
                         DecisionTree_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
                         LinearRegr_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
                         NN_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        AdaBoost_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # AdaBoost_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
                     # UNERSAMPLING RUS','ENN','TL'
                     if rs == 'RUS':
                         X_RUS, y_RUS = RandomUnderSampler(random_state=42).fit_resample(X_train, y_train.values.ravel())
@@ -566,7 +566,7 @@ if __name__ == '__main__':
                         DecisionTree_(X_RUS, y_RUS, X_test, y_test, dataset, rs, model.get('key'), ws)
                         LinearRegr_(X_RUS, y_RUS, X_test, y_test, dataset, rs, model.get('key'), ws)
                         NN_(X_RUS, y_RUS, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        AdaBoost_(X_RUS, y_RUS, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # AdaBoost_(X_RUS, y_RUS, X_test, y_test, dataset, rs, model.get('key'), ws)
                     if rs == 'ENN':
                         X_ENN, y_ENN = EditedNearestNeighbours(random_state=42).fit_resample(X_train,
                                                                                              y_train.values.ravel())
@@ -574,14 +574,14 @@ if __name__ == '__main__':
                         DecisionTree_(X_ENN, y_ENN, X_test, y_test, dataset, rs, model.get('key'), ws)
                         LinearRegr_(X_ENN, y_ENN, X_test, y_test, dataset, rs, model.get('key'), ws)
                         NN_(X_ENN, y_ENN, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        AdaBoost_(X_ENN, y_ENN, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # AdaBoost_(X_ENN, y_ENN, X_test, y_test, dataset, rs, model.get('key'), ws)
                     if rs == 'TL':
                         X_TL, y_TL = TomekLinks(random_state=42).fit_resample(X_train, y_train.values.ravel())
                         RandomForest_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
                         DecisionTree_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
                         LinearRegr_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
                         NN_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        AdaBoost_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # AdaBoost_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
                     # OVERSAMPLING 'ROS','SMOTE','ADA'
                     if rs == 'ROS':
                         ros = RandomOverSampler(random_state=42)
@@ -590,7 +590,7 @@ if __name__ == '__main__':
                         RandomForest_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
                         LinearRegr_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
                         NN_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        AdaBoost_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # AdaBoost_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
                     if rs == 'SMOTE':
                         sm = SMOTE(random_state=42)
                         X_SMO, y_SMO = sm.fit_resample(X_train, y_train)
@@ -598,7 +598,7 @@ if __name__ == '__main__':
                         DecisionTree_(X_SMO, y_SMO, X_test, y_test, dataset, rs, model.get('key'), ws)
                         LinearRegr_(X_SMO, y_SMO, X_test, y_test, dataset, rs, model.get('key'), ws)
                         NN_(X_SMO, y_SMO, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        AdaBoost_(X_SMO, y_SMO, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # AdaBoost_(X_SMO, y_SMO, X_test, y_test, dataset, rs, model.get('key'), ws)
                     if rs == 'ADA':
                         ada = ADASYN(random_state=42)
                         X_ADA, y_ADA = ada.fit_resample(X_train, y_train)
@@ -606,4 +606,4 @@ if __name__ == '__main__':
                         DecisionTree_(X_ADA, y_ADA, X_test, y_test, dataset, rs, model.get('key'), ws)
                         LinearRegr_(X_ADA, y_ADA, X_test, y_test, dataset, rs, model.get('key'), ws)
                         NN_(X_ADA, y_ADA, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        AdaBoost_(X_ADA, y_ADA, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # AdaBoost_(X_ADA, y_ADA, X_test, y_test, dataset, rs, model.get('key'), ws)
