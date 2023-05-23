@@ -139,11 +139,11 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws, params=''):
     writer.writerow(scores)
     f.close()
 
-    params = scores.append(params)
-    f = open("results/perf/" + dataset + "-params.csv", "a")
-    writer = csv.writer(f)
-    writer.writerow(params)
-    f.close()
+    # params = scores.append(params)
+    # f = open("results/perf/" + dataset + "-params.csv", "a")
+    # writer = csv.writer(f)
+    # writer.writerow(params)
+    # f.close()
 
     return scores
 
