@@ -11,8 +11,8 @@ from imblearn.under_sampling import RandomUnderSampler, EditedNearestNeighbours,
 from numpy import arange
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 # from sklearn.linear_model import LogisticRegression
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import (f1_score, roc_auc_score, confusion_matrix, accuracy_score)
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import (f1_score, roc_auc_score, confusion_matrix, accuracy_score, make_scorer)
 from sklearn.model_selection import StratifiedKFold as kf
 from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
 from sklearn.neural_network import MLPClassifier
@@ -77,7 +77,7 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws, params=''):
     scores.append(dataset)
     scores.append(algorithm)
     scores.append(ws)
-    scores.append(model)
+    scores.append(model['key'])
     scores.append(rs)
 
     scores.append(f1_score(y_test, y_pred, average='micro'))
@@ -101,6 +101,7 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws, params=''):
     # precision
     precision = tp / (tp + fp)
     scores.append(precision)
+    print("Precision: " + str(scores[-1]))
 
     # Sensitivity / recall
     sensitivity = tp / (tp + fn)
@@ -139,11 +140,18 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws, params=''):
     writer.writerow(scores)
     f.close()
 
-    # params = scores.append(params)
-    # f = open("results/perf/" + dataset + "-params.csv", "a")
-    # writer = csv.writer(f)
-    # writer.writerow(params)
-    # f.close()
+    params_res = []
+    params_res.append(dataset)
+    params_res.append(algorithm)
+    # params_res.append(ws)
+    params_res.append(model['key'])
+    params_res.append(rs)
+    for p in params:
+        params_res.append(p + ':' + str(params[p]))
+    f2 = open("results/perf/" + dataset + "-params.csv", "a")
+    writer = csv.writer(f2)
+    writer.writerow(params_res)
+    f2.close()
 
     return scores
 
@@ -203,184 +211,66 @@ def plot_confusion_matrixes(y_test, y_pred):
     plt.tight_layout()
     plt.show()
 
-
-def LinearRegr_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
-    print("\nLINEAR REGRESSION")
-    cv_score = []
-    i = 1
-    print("TRAIN AND VALIDATION SETS:")
-    for train_index, test_index in kf.split(Xtrain, Ytrain):
-        print('{} of KFold {}'.format(i, kf.n_splits))
-        xtr_LR, xvl_LR = Xtrain.iloc[train_index], Xtrain.iloc[test_index]
-        ytr_LR, yvl_LR = Ytrain.iloc[train_index], Ytrain.iloc[test_index]
-
-        # model
-        # lr = LogisticRegression(solver='lbfgs', random_state=42, class_weight='balanced', n_jobs=-1)
-        lr = LinearRegression(n_jobs=-1)
-
-        lr.fit(xtr_LR, ytr_LR.values.ravel())
-        score = roc_auc_score(yvl_LR, lr.predict(xvl_LR))
-        print('ROC AUC score:', score)
-        cv_score.append(score)
-        i += 1
-
-    print('\nCROSS VALIDANTION SUMMARY:')
-    print('Mean: ' + str(np.mean(cv_score)))
-    print('Std deviation: ' + str(np.std(cv_score)))
-
+def create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest,  algorithm ):
+    grid = GridSearchCV(estimator=c, param_grid=parameters, cv=kf, verbose=0, scoring='roc_auc')
+    grid.fit(Xtrain, Ytrain)
+    best_model = grid.best_estimator_
+    print(grid.best_params_)
+    best_model.fit(Xtrain, Ytrain)
+    score = roc_auc_score(Ytest, best_model.predict(Xtest))
+    print('ROC AUC score:', score)
     print("\nTEST SET:")
-    # get_scores(Ytest, lr.predict(Xtest), dataset, "LogisticRegression", rs, model, ws)
-    get_scores(Ytest, lr.predict(Xtest), dataset, "LinearRegression", rs, model, ws)
+    get_scores(Ytest, best_model.predict(Xtest), dataset, algorithm, rs, model, ws, grid.best_params_)
+
+def LogisticRegr_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
+    print("\nLOGISTIC REGRESSION")
+    parameters = {}
+    c = LogisticRegression(random_state=42, n_jobs=-1)
+    create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest, 'LogisticRegression')
 
 
 def RandomForest_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     print("RANDOM FOREST")
-    cv_score = []
-    i = 1
-    print("TRAIN AND VALIDATION SETS:")
-    for train_index, test_index in kf.split(Xtrain, Ytrain):
-        print('{} of KFold {}'.format(i, kf.n_splits))
-        xtr_RF, xvl_RF = Xtrain.iloc[train_index], Xtrain.iloc[test_index]
-        ytr_RF, yvl_RF = Ytrain.iloc[train_index], Ytrain.iloc[test_index]
-
-        # model
-        # rf = RandomForestClassifier(random_state=42, class_weight='balanced', n_estimators=100, n_jobs=-1)
-        # rf.fit(xtr_RF, ytr_RF.values.ravel())
-        rf = RandomForestClassifier()
-        # Number of trees in random forest
-        n_estimators = [int(x) for x in np.linspace(start=200, stop=2000, num=10)]
-        # Number of features to consider at every split
-        max_features = ['auto', 'sqrt']
-        # Maximum number of levels in tree
-        max_depth = [int(x) for x in np.linspace(10, 110, num=11)]
-        max_depth.append(None)
-        # Minimum number of samples required to split a node
-        min_samples_split = [2, 5, 10]
-        # Minimum number of samples required at each leaf node
-        min_samples_leaf = [1, 2, 4]
-        # Method of selecting samples for training each tree
-        bootstrap = [True, False]
-        # Create the random grid
-        random_grid = {'n_estimators': n_estimators,
-                       'max_features': max_features,
-                       'max_depth': max_depth,
-                       'min_samples_split': min_samples_split,
-                       'min_samples_leaf': min_samples_leaf,
-                       'bootstrap': bootstrap}
-
-        rf_random = RandomizedSearchCV(estimator=rf, param_distributions=random_grid, n_iter=100, cv=3, verbose=2,
-                                       random_state=42, n_jobs=-1)
-        # Fit the random search model
-        rf_random.fit(xtr_RF, ytr_RF.values.ravel())
-
-        score = roc_auc_score(yvl_RF, rf_random.predict(xvl_RF))
-        print('ROC AUC score:', score)
-        cv_score.append(score)
-        i += 1
-
-    print('\nCROSS VALIDANTION SUMMARY:')
-    print('Mean: ' + str(np.mean(cv_score)))
-    print('Std deviation: ' + str(np.std(cv_score)))
-
-    print("\nTEST SET:")
-    get_scores(Ytest, rf_random.predict(Xtest), dataset, "RandomForest", rs, model, ws, rf_random.best_params_)
+    parameters = {
+        'n_estimators': [int(x) for x in np.linspace(start=100, stop=2000, num=10)],
+        'max_depth': [int(x) for x in np.linspace(10, 110, num=11)],
+    }
+    c = RandomForestClassifier(random_state=42, class_weight='balanced', n_estimators=100, n_jobs=-1)
+    create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest, 'RandomForest')
 
 
 def NN_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     print("NEURAL NETWORK")
-    cv_score = []
-    i = 1
     print("TRAIN AND VALIDATION SETS:")
-    for train_index, test_index in kf.split(Xtrain, Ytrain):
-        print('{} of KFold {}'.format(i, kf.n_splits))
-        xtr_NN, xvl_NN = Xtrain.iloc[train_index], Xtrain.iloc[test_index]
-        ytr_NN, yvl_NN = Ytrain.iloc[train_index], Ytrain.iloc[test_index]
+    parameters = {
+        'hidden_layer_sizes': [(1,), (2,), (3,), (4,), (5,), (6,), (7,), (8,), (9,), (10,), (50,), (100,), (50, 50)],
+        'activation': ['relu', 'tanh'],
+        'solver': ['adam', 'sgd'],
+        'learning_rate': ['constant', 'adaptive'],
+    }
 
-        # model
-        nn = MLPClassifier(random_state=42)
-        # nn.fit(xtr_NN, ytr_NN.values.ravel())
-        grid = GridSearchCV(nn, {}, n_jobs=-1,
-                            verbose=0)
-        grid.fit(xtr_NN, ytr_NN.values.ravel())
-        score = roc_auc_score(yvl_NN, grid.predict(xvl_NN))
-        # score = roc_auc_score(yvl_NN, nn.predict(xvl_NN))
-        print('ROC AUC score:', score)
-        cv_score.append(score)
-        i += 1
-
-    print('\nCROSS VALIDANTION SUMMARY:')
-    print('Mean: ' + str(np.mean(cv_score)))
-    print('Std deviation: ' + str(np.std(cv_score)))
-
-    print("\nTEST SET:")
-    get_scores(Ytest, grid.predict(Xtest), dataset, "MLP", rs, model, ws)
+    c = MLPClassifier(random_state=42, max_iter=500)
+    create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest, 'MLP')
 
 
 def DecisionTree_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     print("\nDECISION TREE")
-    cv_score = []
-    i = 1
     print("TRAIN AND VALIDATION SETS:")
-    parameters = {'max_depth': range(1,11)}
-    for train_index, test_index in kf.split(Xtrain, Ytrain):
-        print('{} of KFold {}'.format(i, kf.n_splits))
-        xtr_DT, xvl_DT = Xtrain.iloc[train_index], Xtrain.iloc[test_index]
-        ytr_DT, yvl_DT = Ytrain.iloc[train_index], Ytrain.iloc[test_index]
 
-        # model
-        dt = DecisionTreeClassifier(random_state=42, class_weight='balanced')
-        # dt.fit(xtr_DT, ytr_DT.values.ravel())
-
-        grid = GridSearchCV(dt, parameters, n_jobs=-1,
-                            verbose=0)
-        grid.fit(xtr_DT, ytr_DT.values.ravel())
-        score = roc_auc_score(yvl_DT, grid.predict(xvl_DT))
-        # score = roc_auc_score(yvl_DT, dt.predict(xvl_DT))
-        print('ROC AUC score:', score)
-        cv_score.append(score)
-        i += 1
-
-    print('\nCROSS VALIDANTION SUMMARY:')
-    print('Mean: ' + str(np.mean(cv_score)))
-    print('Std deviation: ' + str(np.std(cv_score)))
-
-    print("\nTEST SET:")
-    get_scores(Ytest, grid.predict(Xtest), dataset, "DT", rs, model, ws, grid.best_params_)
+    parameters = {'max_depth': range(1, 11)}
+    c = DecisionTreeClassifier(random_state=42, class_weight='balanced')
+    create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest, 'DT')
 
 
 def AdaBoost_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     print('\nADABOOST')
-    cv_score = []
-    i = 1
     print("TRAIN AND VALIDATION SETS:")
 
-    # n_estimators
-    n_trees = [10, 50, 100, 500, 1000, 5000]
-    # for i in arange(0.1, 2.1, 0.1):
-    parameters = {'n_estimators': n_trees, 'learning_rate': arange(0.1, 2.1, 0.1)}
+    # parameters = {'n_estimators': [10, 50, 100, 500, 1000, 5000], 'learning_rate': arange(0.1, 2.1, 0.1)}
+    parameters = {}
     svc = SVC(probability=True, kernel='linear')
-
-    for train_index, test_index in kf.split(Xtrain, Ytrain):
-        print('{} of KFold {}'.format(i, kf.n_splits))
-        xtr_AB, xvl_AB = Xtrain.iloc[train_index], Xtrain.iloc[test_index]
-        ytr_AB, yvl_AB = Ytrain.iloc[train_index], Ytrain.iloc[test_index]
-
-        # model
-        abc = AdaBoostClassifier(base_estimator=svc)
-        grid = GridSearchCV(abc, parameters, n_jobs=-1, verbose=0)
-
-        grid.fit(xtr_AB, ytr_AB.values.ravel())
-        score = roc_auc_score(yvl_AB, grid.predict(xvl_AB))
-        print('ROC AUC score:', score)
-        cv_score.append(score)
-        i += 1
-
-    print('\nCROSS VALIDATION SUMMARY:')
-    print('Mean: ' + str(np.mean(cv_score)))
-    print('Std deviation: ' + str(np.std(cv_score)))
-
-    print("\nTEST SET:")
-    get_scores(Ytest, grid.predict(Xtest), dataset, "AB", rs, model, ws, grid.best_params_)
+    c = AdaBoostClassifier(base_estimator=svc)
+    create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest, 'AB')
 
 
 if __name__ == '__main__':
@@ -474,10 +364,10 @@ if __name__ == '__main__':
         "perf_change"
     ]
 
-    resamples= ['NONE','RUS','ENN','TL','ROS','SMOTE','ADA']
+    # resamples= ['NONE','RUS','ENN','TL','ROS','SMOTE','ADA']
     # resamples= ['RUS','ENN','TL','ROS','SMOTE','ADA']
     # resamples = ['NONE', 'ROS', 'SMOTE', 'ADA']
-    # resamples = ['RUS', 'ENN', 'TL']
+    resamples = ['RUS', 'ENN', 'TL']
     windowsize = [0]
     models = [{'key': 'model1', 'value': model1}, {'key': 'model2', 'value': model2},
               {'key': 'model3', 'value': model3}]
@@ -538,72 +428,92 @@ if __name__ == '__main__':
 
                     print("Scaling features...")
                     scaler = MinMaxScaler()
-                    X_train = pd.DataFrame(scaler.fit_transform(X_train))
-                    X_test = pd.DataFrame(scaler.fit_transform(X_test))
+                    # X_train = pd.DataFrame(scaler.fit_transform(X_train))
+                    # X_test = pd.DataFrame(scaler.fit_transform(X_test))
+                    X_train = scaler.fit_transform(X_train)
+                    X_test = scaler.fit_transform(X_test)
+
                     print("... DONE!")
 
                     print("Setting stratified k-fold...")
                     k = 10
-                    kf = StratifiedKFold(n_splits=k, shuffle=False)
+                    kf = StratifiedKFold(n_splits=k, shuffle=True, random_state=42)
                     print("k =", k)
                     print("... DONE!\n")
-                    y_test = pd.DataFrame(y_test)
-                    y_train = pd.DataFrame(y_train)
+                    # y_test = pd.DataFrame(y_test)
+                    # y_train = pd.DataFrame(y_train)
 
                     # WITHOUT OVER OR UNDERSUMPLING
-                    if rs == 'NONE':
-                        RandomForest_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        DecisionTree_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        LinearRegr_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        NN_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
+                    # if rs == 'NONE':
+                        # RandomForest_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # DecisionTree_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # LogisticRegr_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # NN_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
                         # AdaBoost_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
                     # UNERSAMPLING RUS','ENN','TL'
                     if rs == 'RUS':
-                        X_RUS, y_RUS = RandomUnderSampler(random_state=42).fit_resample(X_train, y_train.values.ravel())
-                        y_RUS = pd.DataFrame(y_RUS)
+                        # X_RUS, y_RUS = RandomUnderSampler(random_state=42).fit_resample(X_train, y_train.values.ravel())
+                        X_train, y_train = RandomUnderSampler(random_state=42).fit_resample(X_train, y_train.values.ravel())
+                        # y_RUS = pd.DataFrame(y_RUS)
 
-                        RandomForest_(X_RUS, y_RUS, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        DecisionTree_(X_RUS, y_RUS, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        LinearRegr_(X_RUS, y_RUS, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        NN_(X_RUS, y_RUS, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # RandomForest_(X_RUS, y_RUS, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # DecisionTree_(X_RUS, y_RUS, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # LogisticRegr_(X_RUS, y_RUS, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # NN_(X_RUS, y_RUS, X_test, y_test, dataset, rs, model.get('key'), ws)
                         # AdaBoost_(X_RUS, y_RUS, X_test, y_test, dataset, rs, model.get('key'), ws)
-                    if rs == 'ENN':
-                        X_ENN, y_ENN = EditedNearestNeighbours(random_state=42).fit_resample(X_train,
-                                                                                             y_train.values.ravel())
-                        RandomForest_(X_ENN, y_ENN, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        DecisionTree_(X_ENN, y_ENN, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        LinearRegr_(X_ENN, y_ENN, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        NN_(X_ENN, y_ENN, X_test, y_test, dataset, rs, model.get('key'), ws)
+                    elif rs == 'ENN':
+                        # X_ENN, y_ENN = EditedNearestNeighbours(random_state=42).fit_resample(X_train,
+                        #                                                                      y_train.values.ravel())
+                        X_train, y_train = EditedNearestNeighbours().fit_resample(X_train,
+                                                                                              y_train.values.ravel())
+
+                        # RandomForest_(X_ENN, y_ENN, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # DecisionTree_(X_ENN, y_ENN, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # LogisticRegr_(X_ENN, y_ENN, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # NN_(X_ENN, y_ENN, X_test, y_test, dataset, rs, model.get('key'), ws)
                         # AdaBoost_(X_ENN, y_ENN, X_test, y_test, dataset, rs, model.get('key'), ws)
-                    if rs == 'TL':
-                        X_TL, y_TL = TomekLinks(random_state=42).fit_resample(X_train, y_train.values.ravel())
-                        RandomForest_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        DecisionTree_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        LinearRegr_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        NN_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
+                    elif rs == 'TL':
+                        # X_TL, y_TL = TomekLinks(random_state=42).fit_resample(X_train, y_train.values.ravel())
+                        X_train, y_train = TomekLinks().fit_resample(X_train, y_train.values.ravel())
+
+                        # RandomForest_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # DecisionTree_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # LogisticRegr_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # NN_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
                         # AdaBoost_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
                     # OVERSAMPLING 'ROS','SMOTE','ADA'
-                    if rs == 'ROS':
+                    elif rs == 'ROS':
                         ros = RandomOverSampler(random_state=42)
-                        X_ROS, y_ROS = ros.fit_resample(X_train, y_train)
-                        DecisionTree_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        RandomForest_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        LinearRegr_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        NN_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # X_ROS, y_ROS = ros.fit_resample(X_train, y_train)
+                        X_train, y_train = ros.fit_resample(X_train, y_train)
+
+                        # DecisionTree_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # RandomForest_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # LogisticRegr_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # NN_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
                         # AdaBoost_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
-                    if rs == 'SMOTE':
+                    elif rs == 'SMOTE':
                         sm = SMOTE(random_state=42)
-                        X_SMO, y_SMO = sm.fit_resample(X_train, y_train)
-                        RandomForest_(X_SMO, y_SMO, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        DecisionTree_(X_SMO, y_SMO, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        LinearRegr_(X_SMO, y_SMO, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        NN_(X_SMO, y_SMO, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # X_SMO, y_SMO = sm.fit_resample(X_train, y_train)
+                        X_train, y_train = sm.fit_resample(X_train, y_train)
+                        # RandomForest_(X_SMO, y_SMO, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # DecisionTree_(X_SMO, y_SMO, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # LogisticRegr_(X_SMO, y_SMO, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # NN_(X_SMO, y_SMO, X_test, y_test, dataset, rs, model.get('key'), ws)
                         # AdaBoost_(X_SMO, y_SMO, X_test, y_test, dataset, rs, model.get('key'), ws)
-                    if rs == 'ADA':
+                    elif rs == 'ADA':
                         ada = ADASYN(random_state=42)
-                        X_ADA, y_ADA = ada.fit_resample(X_train, y_train)
-                        RandomForest_(X_ADA, y_ADA, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        DecisionTree_(X_ADA, y_ADA, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        LinearRegr_(X_ADA, y_ADA, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        NN_(X_ADA, y_ADA, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # X_ADA, y_ADA = ada.fit_resample(X_train, y_train)
+                        X_train, y_train = ada.fit_resample(X_train, y_train)
+                        # RandomForest_(X_ADA, y_ADA, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # DecisionTree_(X_ADA, y_ADA, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # LogisticRegr_(X_ADA, y_ADA, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        # NN_(X_ADA, y_ADA, X_test, y_test, dataset, rs, model.get('key'), ws)
                         # AdaBoost_(X_ADA, y_ADA, X_test, y_test, dataset, rs, model.get('key'), ws)
+
+                    #train models
+                    RandomForest_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
+                    DecisionTree_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
+                    LogisticRegr_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
+                    NN_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
+                    # AdaBoost_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
