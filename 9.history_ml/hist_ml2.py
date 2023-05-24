@@ -195,16 +195,9 @@ def AdaBoost_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest, 'AB')
 
 
-def generateStandardTimeSeriesStructure(all_releases_df, ws, featureList):
-    print("Generating a new dataframe without containing the last release...")
+def generateStandardTimeSeriesStructure(all_releases_df, window_size, featureList):
     df = all_releases_df[all_releases_df['release'] != all_releases_df['release'].max()]
-    print("... DONE!")
-
     df.drop(columns=["project", "commit", "TOTAL_CHANGES", "release", "will_change"])
-
-    print("checking class larger than window size...")
-
-    window_size = ws
 
     class_names_list = df['class'].unique().tolist()
     classes_to_drop_list = list()
@@ -216,32 +209,22 @@ def generateStandardTimeSeriesStructure(all_releases_df, ws, featureList):
     df = df.drop(classes_to_drop_list, axis=0)
     df = df.iloc[::-1]
 
-    print("DONE")
-
-    print("Setting the features...")
     class_names_list = df['class'].unique().tolist()
-    features_list = featureList
-    print("DONE")
-
     timeseries_list = list()
     timeseries_labels = list()
     for class_name in class_names_list:
         class_sequence = df[df['class'] == class_name].reset_index()
         for row in range(len(class_sequence) - 1):
             window = list()
-            # print('row: ', row)
             if row + window_size < len(class_sequence) + 1:
                 for i in range(window_size):
-                    # print(row+i)
-                    window.extend(class_sequence.loc[row + i, features_list].values.astype(np.float64))
-                timeseries_labels.append(class_sequence.loc[row + i, 'will_change'])
+                    window.extend(class_sequence.loc[row + i, featureList].values.astype(np.float64))
+                    timeseries_labels.append(class_sequence.loc[row + i, 'will_change'])
                 timeseries_list.append(window)
 
     timeseries_X = np.array(timeseries_list)
     timeseries_X = timeseries_X[:, ~np.isnan(timeseries_X).any(axis=0)]
     timeseries_labels = np.array(timeseries_labels).astype(np.bool)
-    # np.savetxt("results/test.csv",timeseries_X, delimiter=",")
-
     return timeseries_X, timeseries_labels
 
 
