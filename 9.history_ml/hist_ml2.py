@@ -324,7 +324,7 @@ if __name__ == '__main__':
         "TOTAL_DECLARATIONPARTCHANGES", "TOTAL_CHANGES", "will_change"
     ]
 
-    windowsize = [0]
+    windowsize = [2, 3, 4]
     models = [{'key': 'model1', 'value': model1}, {'key': 'model2', 'value': model2},
               {'key': 'model3', 'value': model3}]
     for dataset in datasets:
