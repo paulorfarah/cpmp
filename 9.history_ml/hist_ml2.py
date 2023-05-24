@@ -237,12 +237,12 @@ if __name__ == '__main__':
 
     # datasets = ['commons-bcel','commons-io','junit4','pdfbox','wro4j']
     # datasets = ['all']
-    datasets = ['commons-csv']
+    datasets = ['commons-bcel']
 
-    # resamples= ['NONE','RUS','ENN','TL','ROS','SMOTE','ADA']
+    resamples= ['NONE','RUS','ENN','TL','ROS','SMOTE','ADA']
     # resamples= ['RUS','ENN','TL','ROS','SMOTE','ADA']
     # resamples = ['NONE', 'ROS', 'SMOTE', 'ADA']
-    resamples = ['RUS', 'ENN', 'TL']
+    # resamples = ['RUS', 'ENN', 'TL']
 
     structural_metrics = ['line', 'cbo', 'cboModified', 'fanin', 'fanout', 'wmc',
                           'rfc', 'loc', 'returnsQty', 'variablesQty', 'parametersQty', 'methodsInvokedQty',
