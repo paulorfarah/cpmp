@@ -184,34 +184,36 @@ def student_ttest_by_class(project_name, file, versions):
 
 def student_ttest_by_method(project_name, file, versions):
     # df = read_csv(file, index_col=None)
-    cols = ['commit_hash', 'class_name', 'method_name', 'own_duration_avg', 'committer_date']
-    df = pd.read_csv(file, names=cols, sep=';', header=None)
+    cols = ['commit_hash', 'class_name', 'method_name', 'own_duration', 'committer_date']
+    df = pd.read_csv(file, names=cols, sep=',')
 
-    df_res = pd.DataFrame(pd.np.empty((0, 11)))
-    # df_res.columns = ['commit', 'prevcommit', 'class_name', 'method_name', 'metric', 'stat', 'pvalue', 'avg1', 'avg2',
-    #                   'change']
-    df_res.columns = ['commit_hash', 'prevcommit', 'class_name', 'method_name', 'metric', 'stat', 'pvalue', 'mean_val', 'avg2',
-                      'change', 'perf_change']
+    df_res = pd.DataFrame(columns=['commit_hash', 'prevcommit', 'class_name', 'method_name', 'metric', 'stat', 'pvalue', 'mean_val', 'avg2',
+                      'change', 'perf_change'])
+
+    # df_res.columns = ['commit_hash', 'prevcommit', 'class_name', 'method_name', 'metric', 'stat', 'pvalue', 'mean_val', 'avg2',
+    #                   'change', 'perf_change']
 
     for v2 in range(1, len(versions)):
         v1 = v2 - 1
         df1 = df.query("commit_hash == '" + versions[v1] + "'")
         # df1 = df.groupby('a')['b'].apply(list).reset_index(name='new')
-        grouped1 = df1.groupby(['commit_hash', 'class_name', 'method_name'], group_keys=False)['own_duration_avg'].apply(list).reset_index(name='new')
+        grouped1 = df1.groupby(['commit_hash', 'class_name', 'method_name'], group_keys=False)['own_duration'].apply(list).reset_index(name='new')
 
         # for metric in val_cols[2:]:
-        metric = 'own_duration_avg'
+        metric = 'own_duration'
         print("---------------- " + metric + " -------------------------")
 
         for name, value in grouped1.iterrows():
             commit = value[0]
             class_name = value[1]
             method_name = value[2]
-            vals1 = value[3]
+            vals1 = [eval(i) for i in value[3]]
 
             vals2 = df.loc[(df['commit_hash'] == versions[v2]) &
                            (df['class_name'] == class_name) &
                            (df['method_name'] == method_name)][metric].to_list()
+
+            vals2 = res = [eval(i) for i in vals2]
 
             try:
                 if isinstance(vals1, collections.abc.Sequence) and isinstance(vals2, collections.abc.Sequence):
@@ -283,10 +285,16 @@ def student_ttest_by_method(project_name, file, versions):
 
 def main():
     print('starting...')
-    commits = {'commons-bcel': ['a9c13ede0e565fae0593c1fde3b774d93abf3f71', 'bebe70de81f2f8912857ddb33e82d3ccc146a24e',
-                    'bbaf623d750f030d186ed026dc201995145c63ec', 'fa271c5d7ed94dd1d9ef31c52f32d1746d5636dc',
-                    'dce57b377d1ad6711ff613639303683e90f7bcc8', '9174edf0d530540c9f6df76b4d786c5a6ad78a5d',
-                    '3aecd517ad0ac4c83828a5f89b6b062acb6f4f6a', 'f38847e90714fbefc33042912d1282cc4fb7d43e'],
+    commits = {'commons-bcel': [
+        'a9c13ede0e565fae0593c1fde3b774d93abf3f71', 'bebe70de81f2f8912857ddb33e82d3ccc146a24e',
+        'bbaf623d750f030d186ed026dc201995145c63ec', 'fa271c5d7ed94dd1d9ef31c52f32d1746d5636dc',
+        'dce57b377d1ad6711ff613639303683e90f7bcc8', '9174edf0d530540c9f6df76b4d786c5a6ad78a5d',
+        '3aecd517ad0ac4c83828a5f89b6b062acb6f4f6a', 'f38847e90714fbefc33042912d1282cc4fb7d43e',
+        '893d9bbcdbd5ce764db1a38eccd73af150e5d34d', '9cd000cc265bfd0997e0277363dbe28ed8a28714',
+        'f70742fde892c2fac4f0862f8f0b00e121f7d16e', 'a303928530ee61e45b4523cd5894c9a8bdb9deaa',
+        '647c723ba1262e1ffce520524692b366a7fde45a', 'fe98b6f098069607955a68f1d695031c011f6452',
+        '5bfa4baa2b7b2cc3dc4cc2600bbcd5d74df7451c', '8fb97bd21c565e0da8300d6a87a95d0fe812bca8',
+        'daada0977098e6633de09fe4c73643ddd8331f06'],
                 'commons-csv': ['1bd1fd8e6065da9d07b5a3a1723b059246b14001',
                                     'e8f24e86bb2d54493e3f0c0bd7787abb1d1d7443',
                                     '1914e7daae2cb39451046e67b993c8ab77e34397',
@@ -350,19 +358,12 @@ def main():
                              'b41030d3dc965eca1b0a0f1c35ce185dd8e80e99']
                     }
 
-    # with open(args.commits) as f:
-    #     commits_list = f.read().splitlines()
-    #     commits_list.reverse()
-    #
-
-    # file = 'C:\\Users\\paulo\\ufpr\\datasets\\software-metrics\\resources\\resources-csv-1.csv'
     # projects = ['commons-bcel', 'commons-csv', 'commons-text', 'easymock', 'jgit', 'Openfire']
-    projects = ['commons-csv', 'easymock', 'gson', 'jgit', 'Openfire']
-    filenames = ['csv', 'easymock', 'gson', 'jgit', 'openfire']
+    projects = ['commons-bcel']
     i = 0
     for project_name in projects:
-        # file = 'C:\\Users\\paulo\\ufpr\\datasets\\' + project_name + '\\own_dur_trace-all.csv'
-        file = '../dynamic_metrics/data/median/own_dur_trace-all-' + filenames[i] + '.csv'
+        file = 'data/' + project_name + '/' + project_name + '-own_dur_trace-all.csv'
+        # file = '/home/usuario/PycharmProjects/cpmp/3.performance/data/commons-bcel/commos-bcel-own_dur_trace-all.csv'
         i += 1
         commits_list = commits[project_name]
 

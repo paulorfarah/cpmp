@@ -280,6 +280,7 @@ def DecisionTree_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     cv_score = []
     i = 1
     print("TRAIN AND VALIDATION SETS:")
+    parameters = {'max_depth': range(1, 11)}
     for train_index, test_index in kf.split(Xtrain, Ytrain):
         print('{} of KFold {}'.format(i, kf.n_splits))
         xtr_DT, xvl_DT = Xtrain.iloc[train_index], Xtrain.iloc[test_index]

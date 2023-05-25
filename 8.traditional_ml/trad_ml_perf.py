@@ -215,7 +215,7 @@ def create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest,  algorithm ):
     grid = GridSearchCV(estimator=c, param_grid=parameters, cv=kf, verbose=0, scoring='roc_auc')
     grid.fit(Xtrain, Ytrain)
     best_model = grid.best_estimator_
-    print(grid.best_params_)
+    # print(grid.best_params_)
     best_model.fit(Xtrain, Ytrain)
     score = roc_auc_score(Ytest, best_model.predict(Xtest))
     print('ROC AUC score:', score)
@@ -485,7 +485,7 @@ if __name__ == '__main__':
                     elif rs == 'ROS':
                         ros = RandomOverSampler(random_state=42)
                         # X_ROS, y_ROS = ros.fit_resample(X_train, y_train)
-                        X_train, y_train = ros.fit_resample(X_train, y_train)
+                        X_train, y_train = ros.fit_resample(X_train, y_train.values.ravel())
 
                         # DecisionTree_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
                         # RandomForest_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
@@ -495,7 +495,7 @@ if __name__ == '__main__':
                     elif rs == 'SMOTE':
                         sm = SMOTE(random_state=42)
                         # X_SMO, y_SMO = sm.fit_resample(X_train, y_train)
-                        X_train, y_train = sm.fit_resample(X_train, y_train)
+                        X_train, y_train = sm.fit_resample(X_train, y_train.values.ravel())
                         # RandomForest_(X_SMO, y_SMO, X_test, y_test, dataset, rs, model.get('key'), ws)
                         # DecisionTree_(X_SMO, y_SMO, X_test, y_test, dataset, rs, model.get('key'), ws)
                         # LogisticRegr_(X_SMO, y_SMO, X_test, y_test, dataset, rs, model.get('key'), ws)
@@ -504,7 +504,7 @@ if __name__ == '__main__':
                     elif rs == 'ADA':
                         ada = ADASYN(random_state=42)
                         # X_ADA, y_ADA = ada.fit_resample(X_train, y_train)
-                        X_train, y_train = ada.fit_resample(X_train, y_train)
+                        X_train, y_train = ada.fit_resample(X_train, y_train.values.ravel())
                         # RandomForest_(X_ADA, y_ADA, X_test, y_test, dataset, rs, model.get('key'), ws)
                         # DecisionTree_(X_ADA, y_ADA, X_test, y_test, dataset, rs, model.get('key'), ws)
                         # LogisticRegr_(X_ADA, y_ADA, X_test, y_test, dataset, rs, model.get('key'), ws)

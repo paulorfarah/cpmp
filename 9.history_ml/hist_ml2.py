@@ -219,7 +219,7 @@ def generateStandardTimeSeriesStructure(all_releases_df, window_size, featureLis
             if row + window_size < len(class_sequence) + 1:
                 for i in range(window_size):
                     window.extend(class_sequence.loc[row + i, featureList].values.astype(np.float64))
-                    timeseries_labels.append(class_sequence.loc[row + i, 'will_change'])
+                timeseries_labels.append(class_sequence.loc[row + i, 'will_change'])
                 timeseries_list.append(window)
 
     timeseries_X = np.array(timeseries_list)

@@ -558,8 +558,8 @@ if __name__ == '__main__':
 
                     print("Scaling features...")
                     scaler = MinMaxScaler()
-                    X_train = pd.DataFrame(scaler.fit_transform(X_train))
-                    X_test = pd.DataFrame(scaler.fit_transform(X_test))
+                    X_train = scaler.fit_transform(X_train)
+                    X_test = scaler.fit_transform(X_test)
                     print("... DONE!")
 
                     print("Setting stratified k-fold...")
