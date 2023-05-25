@@ -302,7 +302,7 @@ if __name__ == '__main__':
                           "MaxInheritanceTree", "MaxNesting", "PercentLackOfCohesion", "RatioCommentToCode",
                           "SumCyclomatic", "SumCyclomaticModified", "SumCyclomaticStrict", "SumEssential"]
     evolutionary_metrics = [
-        'BOC', 'TACH', 'FCH', 'LCH', 'CHO', 'FRCH', 'CHD', 'WCH', 'WCD', 'WFR', 'ATAF', 'LCA', 'LCD', 'CSB', 'CSBS',
+        'BOM', 'TACH', 'FCH', 'LCH', 'CHO', 'FRCH', 'CHD', 'WCH', 'WCD', 'WFR', 'ATAF', 'LCA', 'LCD', 'CSB', 'CSBS',
         'ACDF',
     ]
     change_distiller_metrics = [
