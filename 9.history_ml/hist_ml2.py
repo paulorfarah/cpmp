@@ -113,19 +113,19 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws, params=''):
             'ROC AUC score',
             'Confusion matrix']
 
-    if not os.path.exists('results/perf/' + dataset + '-results-traditional-no-feature-selection-model1-3-perf.csv'):
-        f = open("results/perf/" + dataset + "-results-traditional-no-feature-selection-model1-3-perf.csv", "a")
+    if not os.path.exists('results/perf/' + dataset + '-results-hist-model1-3.csv'):
+        f = open("results/perf/" + dataset + "-results-hist-model1-3.csv", "a")
         writer = csv.writer(f)
         writer.writerow(head)
         f.close()
 
-    f = open("results/perf/" + dataset + "-results-traditional-no-feature-selection-model1-3-perf.csv", "a")
+    f = open("results/perf/" + dataset + "-results-hist-model1-3.csv", "a")
     writer = csv.writer(f)
     writer.writerow(scores)
     f.close()
 
     params = scores.append(params)
-    f = open("results/perf/" + dataset + "-params.csv", "a")
+    f = open("results/perf/" + dataset + "-hist-params.csv", "a")
     writer = csv.writer(f)
     writer.writerow(params)
     f.close()
@@ -199,27 +199,27 @@ def generateStandardTimeSeriesStructure(all_releases_df, window_size, featureLis
     df = all_releases_df[all_releases_df['release'] != all_releases_df['release'].max()]
     df.drop(columns=["project", "commit", "TOTAL_CHANGES", "release", "will_change"])
 
-    class_names_list = df['class'].unique().tolist()
-    classes_to_drop_list = list()
-    for class_name in class_names_list:
-        if len(df[df['class'] == class_name].iloc[::-1]) <= window_size:
-            for drop_class in df.index[df['class'] == class_name].tolist():
-                classes_to_drop_list.append(drop_class)
+    method_names_list = df['method_name'].unique().tolist()
+    methodes_to_drop_list = list()
+    for method_name in method_names_list:
+        if len(df[df['method_name'] == method_name].iloc[::-1]) <= window_size:
+            for drop_method in df.index[df['method_name'] == method_name].tolist():
+                methodes_to_drop_list.append(drop_method)
 
-    df = df.drop(classes_to_drop_list, axis=0)
+    df = df.drop(methodes_to_drop_list, axis=0)
     df = df.iloc[::-1]
 
-    class_names_list = df['class'].unique().tolist()
+    method_names_list = df['method_name'].unique().tolist()
     timeseries_list = list()
     timeseries_labels = list()
-    for class_name in class_names_list:
-        class_sequence = df[df['class'] == class_name].reset_index()
-        for row in range(len(class_sequence) - 1):
+    for method_name in method_names_list:
+        method_sequence = df[df['method_name'] == method_name].reset_index()
+        for row in range(len(method_sequence) - 1):
             window = list()
-            if row + window_size < len(class_sequence) + 1:
+            if row + window_size < len(method_sequence) + 1:
                 for i in range(window_size):
-                    window.extend(class_sequence.loc[row + i, featureList].values.astype(np.float64))
-                timeseries_labels.append(class_sequence.loc[row + i, 'will_change'])
+                    window.extend(method_sequence.loc[row + i, featureList].values.astype(np.float64))
+                timeseries_labels.append(method_sequence.loc[row + 1, 'will_change'])
                 timeseries_list.append(window)
 
     timeseries_X = np.array(timeseries_list)
@@ -239,7 +239,7 @@ if __name__ == '__main__':
     # datasets = ['all']
     datasets = ['commons-bcel']
 
-    resamples= ['NONE','RUS','ENN','TL','ROS','SMOTE','ADA']
+    resamples= ['NONE']#,'RUS','ENN','TL','ROS','SMOTE','ADA']
     # resamples= ['RUS','ENN','TL','ROS','SMOTE','ADA']
     # resamples = ['NONE', 'ROS', 'SMOTE', 'ADA']
     # resamples = ['RUS', 'ENN', 'TL']
