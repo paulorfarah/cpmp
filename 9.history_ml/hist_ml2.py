@@ -239,7 +239,7 @@ if __name__ == '__main__':
     # datasets = ['all']
     datasets = ['commons-bcel']
 
-    resamples= ['NONE']#,'RUS','ENN','TL','ROS','SMOTE','ADA']
+    resamples= ['NONE','RUS','ENN','TL','ROS','SMOTE','ADA']
     # resamples= ['RUS','ENN','TL','ROS','SMOTE','ADA']
     # resamples = ['NONE', 'ROS', 'SMOTE', 'ADA']
     # resamples = ['RUS', 'ENN', 'TL']
