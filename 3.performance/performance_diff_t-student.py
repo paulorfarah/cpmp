@@ -183,15 +183,11 @@ def student_ttest_by_class(project_name, file, versions):
 
 
 def student_ttest_by_method(project_name, file, versions):
-    # df = read_csv(file, index_col=None)
     cols = ['commit_hash', 'class_name', 'method_name', 'own_duration', 'committer_date']
     df = pd.read_csv(file, names=cols, sep=',')
 
     df_res = pd.DataFrame(columns=['commit_hash', 'prevcommit', 'class_name', 'method_name', 'metric', 'stat', 'pvalue', 'mean_val', 'avg2',
                       'change', 'perf_change'])
-
-    # df_res.columns = ['commit_hash', 'prevcommit', 'class_name', 'method_name', 'metric', 'stat', 'pvalue', 'mean_val', 'avg2',
-    #                   'change', 'perf_change']
 
     for v2 in range(1, len(versions)):
         v1 = v2 - 1
@@ -265,22 +261,23 @@ def student_ttest_by_method(project_name, file, versions):
     df_res.drop(df_res.index[df_res['mean_val'] == 0], inplace=True)
     df_res.drop(df_res.index[df_res['avg2'] == 0], inplace=True)
     df_res['change_abs'] = df_res['change'].abs()
-    df_median_by_commit = df_res.groupby(['commit_hash'])['change_abs'].median()
-    # print(df_median_by_commit.head)
-    medianDurations = {}
-    for commit, commit_median in df_median_by_commit.iteritems():
-        # print(commit + ': ' + str(commit_median))
-        df_commit = df_res.loc[df['commit_hash'] == commit]
-        medianDurations[commit] = df_commit['change_abs'].median()
-    df_res['changed_median'] = df_res.apply(
-        lambda x: calculate_perf_change(x.commit_hash, abs(x.change), medianDurations), axis=1)
+
+    # df_median_by_commit = df_res.groupby(['commit_hash'])['change_abs'].median()
+    # # print(df_median_by_commit.head)
+    # medianDurations = {}
+    # for commit, commit_median in df_median_by_commit:#.iteritems():
+    #     # print(commit + ': ' + str(commit_median))
+    #     df_commit = df_res.loc[df['commit_hash'] == commit]
+    #     medianDurations[commit] = df_commit['change_abs'].median()
+    # df_res['changed_median'] = df_res.apply(
+    #     lambda x: calculate_perf_change(x.commit_hash, abs(x.change), medianDurations), axis=1)
 
     df_res.to_csv('results/' + project_name + '/' + project_name + '-method-performance-diff_all.csv',
                   index=False)
     df_res.loc[df_res['perf_change'] == 1].to_csv(
         'results/' + project_name + '/' + project_name + '-method-performance-diff_filtered.csv', index=False)
-    df_res.loc[df_res['changed_median'] == 1].to_csv(
-                'results/' + project_name + '/' + project_name + '-method-performance-median_filtered.csv', index=False)
+    # df_res.loc[df_res['changed_median'] == 1].to_csv(
+    #             'results/' + project_name + '/' + project_name + '-method-performance-median_filtered.csv', index=False)
     # df_res.to_csv('results/method_' + project_name + '-performance-diff.csv', index=False)
 
 def main():

@@ -52,11 +52,11 @@ def plot_confusion_matrix(cm, dataset,
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
     plt.tight_layout()
-    plt.savefig('results/perf/cf-' + dataset + '-perf.png')
+    plt.savefig('results/cpmp/cf-' + dataset + '.png')
     plt.close()
 
 
-def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws, params=''):
+def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws, params=[]):
     scores = []
     scores.append(dataset)
     scores.append(algorithm)
@@ -113,22 +113,23 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws, params=''):
             'ROC AUC score',
             'Confusion matrix']
 
-    if not os.path.exists('results/perf/' + dataset + '-results-hist-model1-3.csv'):
-        f = open("results/perf/" + dataset + "-results-hist-model1-3.csv", "a")
+    if not os.path.exists('results/cpmp/' + dataset + '-results-hist-model1-3.csv'):
+        f = open("results/cpmp/" + dataset + "-results-hist-model1-3.csv", "a")
         writer = csv.writer(f)
         writer.writerow(head)
         f.close()
 
-    f = open("results/perf/" + dataset + "-results-hist-model1-3.csv", "a")
+    f = open("results/cpmp/" + dataset + "-results-hist-model1-3.csv", "a")
     writer = csv.writer(f)
     writer.writerow(scores)
     f.close()
 
-    params = scores.append(params)
-    f = open("results/perf/" + dataset + "-hist-params.csv", "a")
-    writer = csv.writer(f)
-    writer.writerow(params)
-    f.close()
+    if params:
+        params = scores.append(params)
+        f = open("results/cpmp/" + dataset + "-hist-params.csv", "a")
+        writer = csv.writer(f)
+        writer.writerow(params)
+        f.close()
 
     return scores
 
@@ -237,7 +238,7 @@ if __name__ == '__main__':
 
     # datasets = ['commons-bcel','commons-io','junit4','pdfbox','wro4j']
     # datasets = ['all']
-    datasets = ['commons-bcel']
+    datasets = ['easymock']
 
     resamples= ['NONE','RUS','ENN','TL','ROS','SMOTE','ADA']
     # resamples= ['RUS','ENN','TL','ROS','SMOTE','ADA']

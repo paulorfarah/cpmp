@@ -111,14 +111,15 @@ def format_method(row):
 
 
 
-project_name = 'jgit'
+project_name = 'commons-bcel'
 df = pd.read_csv('results/' + project_name + '-all-releases.csv')
 df.columns = cols
 
 df_perf = pd.read_csv('../3.performance/results/' + project_name + '/' + project_name + '-method-performance-diff_all.csv')
 
+# commit_hash,prevcommit,class_name,method_name,metric,stat,pvalue,mean_val,avg2,change,perf_change,change_abs
 df_perf.columns = ['commit_hash', 'prevcommit', 'class_name', 'method_name', 'metric', 'stat', 'pvalue', 'mean_val',
-                   'avg2', 'change', 'perf_change', 'change_abs', 'changed_median']
+                   'avg2', 'change', 'perf_change', 'change_abs']
 df_perf['project'] = project_name
 df_perf['original_method_name'] = df_perf['method_name']
 
