@@ -232,10 +232,10 @@ def LogisticRegr_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
 def RandomForest_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     print("RANDOM FOREST")
     parameters = {
-        'n_estimators': [int(x) for x in np.linspace(start=100, stop=2000, num=10)],
+        'n_estimators': [int(x) for x in np.linspace(start=100, stop=2000, num=200)],
         'max_depth': [int(x) for x in np.linspace(10, 110, num=11)],
     }
-    c = RandomForestClassifier(random_state=42, class_weight='balanced', n_estimators=100, n_jobs=-1)
+    c = RandomForestClassifier(random_state=42, class_weight='balanced', n_jobs=-1)
     create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest, 'RandomForest')
 
 
@@ -243,10 +243,10 @@ def NN_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     print("NEURAL NETWORK")
     print("TRAIN AND VALIDATION SETS:")
     parameters = {
-        'hidden_layer_sizes': [(1,), (2,), (3,), (4,), (5,), (6,), (7,), (8,), (9,), (10,), (50,), (100,), (50, 50)],
+        'hidden_layer_sizes': [(1,), (2,), (5,), (10,), (50,), (100,), (50, 50)],
         'activation': ['relu', 'tanh'],
         'solver': ['adam', 'sgd'],
-        'learning_rate': ['constant', 'adaptive'],
+        'learning_rate': ['constant', 'adaptive']
     }
 
     c = MLPClassifier(random_state=42, max_iter=500)
@@ -364,7 +364,7 @@ if __name__ == '__main__':
         "perf_change"
     ]
 
-    resamples= ['NONE','RUS','ENN','TL','ROS','SMOTE','ADA']
+    resamples = ['NONE', 'RUS', 'ENN', 'TL', 'ROS', 'SMOTE', 'ADA']
     # resamples= ['RUS','ENN','TL','ROS','SMOTE','ADA']
     # resamples = ['NONE', 'ROS', 'SMOTE', 'ADA']
     # resamples = ['RUS', 'ENN', 'TL']
