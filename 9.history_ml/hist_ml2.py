@@ -154,11 +154,8 @@ def LogisticRegr_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
 def RandomForest_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     print("RANDOM FOREST")
     parameters = {
-        'n_estimators': [int(x) for x in np.linspace(start=200, stop=2000, num=10)],
+        'n_estimators': [int(x) for x in np.linspace(start=100, stop=2000, num=200)],
         'max_depth': [int(x) for x in np.linspace(10, 110, num=11)],
-        'min_samples_split': [2, 5, 10],
-        'min_samples_leaf': [1, 2, 4],
-        'bootstrap': [True, False]
     }
     c = RandomForestClassifier(random_state=42, class_weight='balanced', n_estimators=100, n_jobs=-1)
     create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest, 'RandomForest')
@@ -168,7 +165,7 @@ def NN_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     print("NEURAL NETWORK")
     print("TRAIN AND VALIDATION SETS:")
     parameters = {
-        'hidden_layer_sizes': [(50,), (100,), (50, 50)],
+        'hidden_layer_sizes': [(1,), (2,), (5,), (10,), (50,), (100,), (50, 50)],
         'activation': ['relu', 'tanh'],
         'solver': ['adam', 'sgd'],
         'learning_rate': ['constant', 'adaptive'],
@@ -181,7 +178,7 @@ def DecisionTree_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     print("\nDECISION TREE")
     print("TRAIN AND VALIDATION SETS:")
 
-    parameters = {'max_depth': range(1, 11)}
+    parameters = {'max_depth': range(1, 11, 2)}
     c = DecisionTreeClassifier(random_state=42, class_weight='balanced')
     create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest, 'DT')
 
