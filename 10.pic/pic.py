@@ -497,11 +497,11 @@ if __name__ == '__main__':
         "perf_change"
     ]
 
-    # resamples = ['NONE', 'RUS', 'ENN', 'TL', 'ROS', 'SMOTE', 'ADA']
+    resamples = ['NONE', 'RUS', 'ENN', 'TL', 'ROS', 'SMOTE', 'ADA']
     # resamples= ['RUS','ENN','TL','ROS','SMOTE','ADA']
     # resamples = ['NONE', 'ROS', 'SMOTE', 'ADA']
     # resamples = ['RUS', 'ENN', 'TL']
-    resamples = ['NONE']
+    # resamples = ['NONE']
     windowsize = [0]
     models = [{'key': 'model1', 'value': model1}, {'key': 'model2', 'value': model2},
               {'key': 'model3', 'value': model3}]
@@ -579,77 +579,24 @@ if __name__ == '__main__':
                     kf = StratifiedKFold(n_splits=k, shuffle=True, random_state=42)
                     print("k =", k)
                     print("... DONE!\n")
-                    # y_test = pd.DataFrame(y_test)
-                    # y_train = pd.DataFrame(y_train)
                     y_train = y_train.values.ravel()
-                    # WITHOUT OVER OR UNDERSUMPLING
-                    # if rs == 'NONE':
-                    # RandomForest_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
-                    # DecisionTree_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
-                    # LogisticRegr_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
-                    # NN_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
-                    # AdaBoost_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
-                    # UNERSAMPLING RUS','ENN','TL'
                     if rs == 'RUS':
-                        # X_RUS, y_RUS = RandomUnderSampler(random_state=42).fit_resample(X_train, y_train.values.ravel())
                         X_train, y_train = RandomUnderSampler(random_state=42).fit_resample(X_train,
                                                                                             y_train)
-                        # y_RUS = pd.DataFrame(y_RUS)
-
-                        # RandomForest_(X_RUS, y_RUS, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # DecisionTree_(X_RUS, y_RUS, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # LogisticRegr_(X_RUS, y_RUS, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # NN_(X_RUS, y_RUS, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # AdaBoost_(X_RUS, y_RUS, X_test, y_test, dataset, rs, model.get('key'), ws)
                     elif rs == 'ENN':
-                        # X_ENN, y_ENN = EditedNearestNeighbours(random_state=42).fit_resample(X_train,
-                        #                                                                      y_train.values.ravel())
                         X_train, y_train = EditedNearestNeighbours().fit_resample(X_train,
                                                                                   y_train)
-
-                        # RandomForest_(X_ENN, y_ENN, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # DecisionTree_(X_ENN, y_ENN, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # LogisticRegr_(X_ENN, y_ENN, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # NN_(X_ENN, y_ENN, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # AdaBoost_(X_ENN, y_ENN, X_test, y_test, dataset, rs, model.get('key'), ws)
                     elif rs == 'TL':
-                        # X_TL, y_TL = TomekLinks(random_state=42).fit_resample(X_train, y_train.values.ravel())
                         X_train, y_train = TomekLinks().fit_resample(X_train, y_train)
-
-                        # RandomForest_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # DecisionTree_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # LogisticRegr_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # NN_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # AdaBoost_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
-                    # OVERSAMPLING 'ROS','SMOTE','ADA'
                     elif rs == 'ROS':
                         ros = RandomOverSampler(random_state=42)
-                        # X_ROS, y_ROS = ros.fit_resample(X_train, y_train)
                         X_train, y_train = ros.fit_resample(X_train, y_train)
-
-                        # DecisionTree_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # RandomForest_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # LogisticRegr_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # NN_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # AdaBoost_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
                     elif rs == 'SMOTE':
                         sm = SMOTE(random_state=42)
-                        # X_SMO, y_SMO = sm.fit_resample(X_train, y_train)
                         X_train, y_train = sm.fit_resample(X_train, y_train)
-                        # RandomForest_(X_SMO, y_SMO, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # DecisionTree_(X_SMO, y_SMO, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # LogisticRegr_(X_SMO, y_SMO, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # NN_(X_SMO, y_SMO, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # AdaBoost_(X_SMO, y_SMO, X_test, y_test, dataset, rs, model.get('key'), ws)
                     elif rs == 'ADA':
                         ada = ADASYN(random_state=42)
-                        # X_ADA, y_ADA = ada.fit_resample(X_train, y_train)
                         X_train, y_train = ada.fit_resample(X_train, y_train)
-                        # RandomForest_(X_ADA, y_ADA, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # DecisionTree_(X_ADA, y_ADA, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # LogisticRegr_(X_ADA, y_ADA, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # NN_(X_ADA, y_ADA, X_test, y_test, dataset, rs, model.get('key'), ws)
-                        # AdaBoost_(X_ADA, y_ADA, X_test, y_test, dataset, rs, model.get('key'), ws)
 
                     # train models
                     RandomForest_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
