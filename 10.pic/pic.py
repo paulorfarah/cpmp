@@ -314,22 +314,31 @@ def get_scores(y_test, y_pred, algorithm, dataset, rs, model, ws, params=[]):
 
     Path("results/cpmp/").mkdir(parents=True, exist_ok=True)
     if not os.path.exists('results/cpmp/' + dataset + '-pic.csv'):
-        f = open("results/cpmp/" + dataset + "-pic.csv", "a")
+        f = open("results/cpmp/" + dataset + "-pic.csv", "a+")
         writer = csv.writer(f)
         writer.writerow(head)
         f.close()
 
-    f = open("results/cpmp/" + dataset + "-pic.csv", "a")
+    f = open("results/cpmp/" + dataset + "-pic.csv", "a+")
     writer = csv.writer(f)
     writer.writerow(scores)
     f.close()
 
-    if params:
-        params = scores.append(params)
-        f = open("results/cpmp/" + dataset + "-pic-params.csv", "a")
+    params_aux = []
+    params_aux.append(dataset)
+    params_aux.append(algorithm)
+    params_aux.append(ws)
+    params_aux.append(model)
+    params_aux.append(rs)
+    params_aux.append(params)
+    try:
+        f = open("results/cpmp/" + dataset + "-pic-params.csv", "a+")
         writer = csv.writer(f)
-        writer.writerow(params)
+        writer.writerow(params_aux)
         f.close()
+    except Exception as e:
+        print('ERROR saving params in pic: ' + str(e))
+
 
     return scores
 
@@ -369,8 +378,8 @@ def NN_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     parameters = {
         'hidden_layer_sizes': [(1,), (2,), (5,), (10,), (50,), (100,), (50, 50)],
         'activation': ['relu', 'tanh'],
-        'solver': ['adam', 'sgd'],
-        'learning_rate': ['constant', 'adaptive']
+        # 'solver': ['adam', 'sgd'],
+        # 'learning_rate': ['constant', 'adaptive']
     }
 
     c = MLPClassifier(random_state=42, max_iter=500)
@@ -643,8 +652,8 @@ if __name__ == '__main__':
                         # AdaBoost_(X_ADA, y_ADA, X_test, y_test, dataset, rs, model.get('key'), ws)
 
                     # train models
-                    # RandomForest_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
-                    # DecisionTree_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
+                    RandomForest_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
+                    DecisionTree_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
                     LogisticRegr_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
-                    # NN_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
+                    NN_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
                     # AdaBoost_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
