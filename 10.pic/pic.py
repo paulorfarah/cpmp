@@ -521,7 +521,7 @@ if __name__ == '__main__':
                     # all_releases_df = df_row.fillna(0)
 
                     all_releases_df = pd.read_csv(
-                        '../6.join_metrics/results/' + dataset + '-perf-diff-all-pic.csv')
+                        '../6.join_metrics/results/' + dataset + '-perf-diff-all.csv')
                     all_releases_df = all_releases_df.fillna(0)
                     # all_releases_df.columns = main_columns
                     # x_raw = all_releases_df[model.get('value')]
