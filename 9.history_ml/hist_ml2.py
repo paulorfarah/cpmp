@@ -134,6 +134,7 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws, params=[]):
     return scores
 
 def create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest,  algorithm ):
+    parameters = {}
     grid = GridSearchCV(estimator=c, param_grid=parameters, cv=kf, verbose=0, scoring='roc_auc')
     grid.fit(Xtrain, Ytrain)
     best_model = grid.best_estimator_
