@@ -119,17 +119,17 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws, params=[]):
         writer.writerow(head)
         f.close()
 
-    f = open("results/cpmp/" + dataset + "-results-hist-model1-3.csv", "a")
+    f = open("results/cpmp/" + dataset + "-hist-model1-3.csv", "a")
     writer = csv.writer(f)
     writer.writerow(scores)
     f.close()
 
-    if params:
-        params = scores.append(params)
-        f = open("results/cpmp/" + dataset + "-hist-params.csv", "a")
-        writer = csv.writer(f)
-        writer.writerow(params)
-        f.close()
+    # if params:
+    #     params = scores.append(params)
+    #     f = open("results/cpmp/" + dataset + "-hist-params.csv", "a")
+    #     writer = csv.writer(f)
+    #     writer.writerow(params)
+    #     f.close()
 
     return scores
 
