@@ -368,10 +368,10 @@ if __name__ == '__main__':
                     if rs == 'RUS':
                         X_train, y_train = RandomUnderSampler(random_state=42).fit_resample(X_train, y_train.values.ravel())
                     elif rs == 'ENN':
-                        X_train, y_train = EditedNearestNeighbours(random_state=42).fit_resample(X_train,
+                        X_train, y_train = EditedNearestNeighbours().fit_resample(X_train,
                                                                                               y_train.values.ravel())
                     elif rs == 'TL':
-                        X_train, y_train = TomekLinks(random_state=42).fit_resample(X_train, y_train.values.ravel())
+                        X_train, y_train = TomekLinks().fit_resample(X_train, y_train.values.ravel())
                     elif rs == 'ROS':
                         ros = RandomOverSampler(random_state=42)
                         X_train, y_train = ros.fit_resample(X_train, y_train)
