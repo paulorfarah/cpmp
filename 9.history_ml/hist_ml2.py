@@ -383,8 +383,8 @@ if __name__ == '__main__':
                         X_train, y_train = ada.fit_resample(X_train, y_train)
 
                     #train models
-                    # RandomForest_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
-                    # DecisionTree_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
+                    RandomForest_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
+                    DecisionTree_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
                     LogisticRegr_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
-                    # NN_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
+                    NN_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
                     # AdaBoost_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
