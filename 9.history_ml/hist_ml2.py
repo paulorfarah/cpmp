@@ -113,8 +113,8 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws, params=[]):
             'ROC AUC score',
             'Confusion matrix']
 
-    if not os.path.exists('results/cpmp/' + dataset + '-results-hist-model1-3.csv'):
-        f = open("results/cpmp/" + dataset + "-results-hist-model1-3.csv", "a")
+    if not os.path.exists('results/cpmp/' + dataset + '-hist-model1-3.csv'):
+        f = open("results/cpmp/" + dataset + "-hist-model1-3.csv", "a")
         writer = csv.writer(f)
         writer.writerow(head)
         f.close()
@@ -236,7 +236,7 @@ if __name__ == '__main__':
 
     # datasets = ['commons-bcel','commons-io','junit4','pdfbox','wro4j']
     # datasets = ['all']
-    datasets = ['easymock']
+    datasets = ['commons-bcel']
 
     resamples= ['NONE','RUS','ENN','TL','ROS','SMOTE','ADA']
     # resamples= ['RUS','ENN','TL','ROS','SMOTE','ADA']
@@ -363,6 +363,8 @@ if __name__ == '__main__':
                     kf = StratifiedKFold(n_splits=k, shuffle=True)
                     print("k =", k)
                     print("... DONE!\n")
+                    y_test = pd.DataFrame(y_test)
+                    y_train = pd.DataFrame(y_train)
                     if rs == 'RUS':
                         X_train, y_train = RandomUnderSampler(random_state=42).fit_resample(X_train, y_train.values.ravel())
                     elif rs == 'ENN':
