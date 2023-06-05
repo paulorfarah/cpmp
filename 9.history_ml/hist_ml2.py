@@ -133,7 +133,7 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws, params=[]):
 
     return scores
 
-def create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest,  algorithm ):
+def create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest,  algorithm, dataset, rs, model, ws ):
     parameters = {}
     grid = GridSearchCV(estimator=c, param_grid=parameters, cv=kf, verbose=0, scoring='roc_auc')
     grid.fit(Xtrain, Ytrain)
@@ -149,7 +149,7 @@ def LogisticRegr_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     print("\nLOGISTIC REGRESSION")
     parameters = {}
     c = LogisticRegression(random_state=42, n_jobs=-1)
-    create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest, 'LogisticRegression')
+    create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest, 'LogisticRegression', dataset, rs, model, ws)
 
 
 def RandomForest_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
@@ -159,7 +159,7 @@ def RandomForest_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
         'max_depth': [int(x) for x in np.linspace(10, 110, num=11)],
     }
     c = RandomForestClassifier(random_state=42, class_weight='balanced', n_estimators=100, n_jobs=-1)
-    create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest, 'RandomForest')
+    create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest, 'RandomForest', dataset, rs, model, ws)
 
 
 def NN_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
@@ -172,7 +172,7 @@ def NN_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
         'learning_rate': ['constant', 'adaptive'],
     }
     c = MLPClassifier(random_state=42)
-    create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest, 'MLP')
+    create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest, 'MLP', dataset, rs, model, ws)
 
 
 def DecisionTree_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
@@ -181,7 +181,7 @@ def DecisionTree_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
 
     parameters = {'max_depth': range(1, 11, 2)}
     c = DecisionTreeClassifier(random_state=42, class_weight='balanced')
-    create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest, 'DT')
+    create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest, 'DT', dataset, rs, model, ws)
 
 
 def AdaBoost_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
@@ -191,7 +191,7 @@ def AdaBoost_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     parameters = {'n_estimators': [10, 50, 100, 500, 1000, 5000], 'learning_rate': arange(0.1, 2.1, 0.1)}
     svc = SVC(probability=True, kernel='linear')
     c = AdaBoostClassifier(base_estimator=svc)
-    create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest, 'AB')
+    create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest, 'AB', dataset, rs, model, ws)
 
 
 def generateStandardTimeSeriesStructure(all_releases_df, window_size, featureList):
@@ -383,8 +383,8 @@ if __name__ == '__main__':
                         X_train, y_train = ada.fit_resample(X_train, y_train)
 
                     #train models
-                    RandomForest_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
-                    DecisionTree_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
+                    # RandomForest_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
+                    # DecisionTree_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
                     LogisticRegr_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
-                    NN_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
+                    # NN_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
                     # AdaBoost_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
