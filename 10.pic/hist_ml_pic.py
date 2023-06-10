@@ -113,20 +113,20 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws, params=[]):
             'ROC AUC score',
             'Confusion matrix']
 
-    if not os.path.exists('results/cpmp/' + dataset + '-hist-model1-3.csv'):
-        f = open("results/cpmp/" + dataset + "-hist-model1-3.csv", "a")
+    if not os.path.exists('results/cpmp/' + dataset + '-hist-model1-3-pic.csv'):
+        f = open("results/cpmp/" + dataset + "-hist-model1-3-pic.csv", "a")
         writer = csv.writer(f)
         writer.writerow(head)
         f.close()
 
-    f = open("results/cpmp/" + dataset + "-hist-model1-3.csv", "a")
+    f = open("results/cpmp/" + dataset + "-hist-model1-3-pic.csv", "a")
     writer = csv.writer(f)
     writer.writerow(scores)
     f.close()
 
     # if params:
     #     params = scores.append(params)
-    #     f = open("results/cpmp/" + dataset + "-hist-params.csv", "a")
+    #     f = open("results/cpmp/" + dataset + "-hist-params-pic.csv", "a")
     #     writer = csv.writer(f)
     #     writer.writerow(params)
     #     f.close()
@@ -333,7 +333,8 @@ if __name__ == '__main__':
             for rs in resamples:
                 for model in models:
                     all_releases_df = pd.read_csv(
-                        '../6.join_metrics/results/' + dataset + '-all-releases.csv')
+                        # '../6.join_metrics/results/' + dataset + '-all-releases.csv')
+                    '../6.join_metrics/results/' + dataset + '-perf-diff-all.csv')
                     all_releases_df.columns = main_columns
                     all_releases_df = all_releases_df.fillna(0)
 
