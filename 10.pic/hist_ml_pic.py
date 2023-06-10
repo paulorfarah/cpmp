@@ -279,6 +279,7 @@ if __name__ == '__main__':
     model3 = evolutionary_metrics
 
     main_columns = [
+        'idx',
         # ck
         'file', 'class', 'method', 'constructor', 'line', 'cbo', 'cboModified', 'fanin', 'fanout', 'wmc',
         'rfc', 'loc', 'returnsQty', 'variablesQty', 'parametersQty', 'methodsInvokedQty',
