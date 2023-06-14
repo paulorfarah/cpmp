@@ -113,13 +113,13 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws, params=[]):
             'ROC AUC score',
             'Confusion matrix']
 
-    if not os.path.exists('results/cpmp/' + dataset + '-hist-model1-3.csv'):
-        f = open("results/cpmp/" + dataset + "-hist-model1-3.csv", "a")
+    if not os.path.exists('results/perf/' + dataset + '-hist-model1-3-perf.csv'):
+        f = open("results/perf/" + dataset + "-hist-model1-3-perf.csv", "a")
         writer = csv.writer(f)
         writer.writerow(head)
         f.close()
 
-    f = open("results/cpmp/" + dataset + "-hist-model1-3.csv", "a")
+    f = open("results/perf/" + dataset + "-hist-model1-3.csv-perf", "a")
     writer = csv.writer(f)
     writer.writerow(scores)
     f.close()
@@ -134,11 +134,11 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws, params=[]):
     return scores
 
 def create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest,  algorithm, dataset, rs, model, ws ):
-    parameters = {}
+    # parameters = {}
     grid = GridSearchCV(estimator=c, param_grid=parameters, cv=kf, verbose=0, scoring='roc_auc')
     grid.fit(Xtrain, Ytrain)
     best_model = grid.best_estimator_
-    print(grid.best_params_)
+    # print(grid.best_params_)
     best_model.fit(Xtrain, Ytrain)
     score = roc_auc_score(Ytest, best_model.predict(Xtest))
     print('ROC AUC score:', score)
@@ -154,10 +154,10 @@ def LogisticRegr_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
 
 def RandomForest_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     print("RANDOM FOREST")
-    parameters = {
-        'n_estimators': [int(x) for x in np.linspace(start=100, stop=2000, num=200)],
-        'max_depth': [int(x) for x in np.linspace(10, 110, num=11)],
-    }
+    # parameters = {
+    #     'n_estimators': [int(x) for x in np.linspace(start=100, stop=2000, num=200)],
+    #     'max_depth': [int(x) for x in np.linspace(10, 110, num=11)],
+    # }
     parameters = {}
     if dataset == 'commons-bcel':
         if model == 'model1':
@@ -323,7 +323,7 @@ def AdaBoost_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
 
 def generateStandardTimeSeriesStructure(all_releases_df, window_size, featureList):
     df = all_releases_df[all_releases_df['release'] != all_releases_df['release'].max()]
-    df.drop(columns=["project", "commit", "TOTAL_CHANGES", "release", "will_change"])
+    df.drop(columns=["project", "commit", "TOTAL_CHANGES", "release", "will_change", "perf_change"])
 
     method_names_list = df['method_name'].unique().tolist()
     methodes_to_drop_list = list()
@@ -345,7 +345,7 @@ def generateStandardTimeSeriesStructure(all_releases_df, window_size, featureLis
             if row + window_size < len(method_sequence) + 1:
                 for i in range(window_size):
                     window.extend(method_sequence.loc[row + i, featureList].values.astype(np.float64))
-                timeseries_labels.append(method_sequence.loc[row + 1, 'will_change'])
+                timeseries_labels.append(method_sequence.loc[row + 1, 'perf_change'])
                 timeseries_list.append(window)
 
     timeseries_X = np.array(timeseries_list)
@@ -353,6 +353,173 @@ def generateStandardTimeSeriesStructure(all_releases_df, window_size, featureLis
     timeseries_labels = np.array(timeseries_labels).astype(np.bool)
     return timeseries_X, timeseries_labels
 
+def get_resampling_by_algorithm(algorithm, ds, md):
+    rs = 'NONE'
+    if algorithm == 'DT':
+        if ds == 'commons-bcel':
+            if md == 'model1':
+                rs = 'ENN'
+            elif md == 'model2':
+                rs = 'NONE'
+            elif md == 'model3':
+                rs = 'NONE'
+        elif ds == 'commons-csv':
+            if md == 'model1':
+                rs = 'ENN'
+            elif md == 'model2':
+                rs = 'NONE'
+            elif md == 'model3':
+                rs = 'NONE'
+        elif ds == 'easymock':
+            if md == 'model1':
+                rs = 'ENN'
+            elif md == 'model2':
+                rs = 'NONE'
+            elif md == 'model3':
+                rs = 'NONE'
+        elif ds == 'jgit':
+            if md == 'model1':
+                rs = 'ENN'
+            elif md == 'model2':
+                rs = 'NONE'
+            elif md == 'model3':
+                rs = 'NONE'
+        elif ds == 'Openfire':
+            if md == 'model1':
+                rs = 'ENN'
+            elif md == 'model2':
+                rs = 'NONE'
+            elif md == 'model3':
+                rs = 'NONE'
+    elif algorithm == 'LR':
+        if ds == 'commons-bcel':
+            if md == 'model1':
+                rs = 'ADA'
+            elif md == 'model2':
+                rs = 'SMOTE'
+            elif md == 'model3':
+                rs = 'ENN'
+        elif ds == 'commons-csv':
+            if md == 'model1':
+                rs = 'ADA'
+            elif md == 'model2':
+                rs = 'RUS'
+            elif md == 'model3':
+                rs = 'SMOTE'
+        elif ds == 'easymock':
+            if md == 'model1':
+                rs = 'SMOTE'
+            elif md == 'model2':
+                rs = 'RUS'
+            elif md == 'model3':
+                rs = 'NONE'
+        elif ds == 'jgit':
+            if md == 'model1':
+                rs = 'ADA'
+            elif md == 'model2':
+                rs = 'SMOTE'
+            elif md == 'model3':
+                rs = 'NONE'
+        elif ds == 'Openfire':
+            if md == 'model1':
+                rs = 'ADA'
+            elif md == 'model2':
+                rs = 'ADA'
+            elif md == 'model3':
+                rs = 'ENN'
+    elif algorithm == 'MLP':
+        if ds == 'commons-bcel':
+            if md == 'model1':
+                rs = 'RUS'
+            elif md == 'model2':
+                rs = 'ADA'
+            elif md == 'model3':
+                rs = 'RUS'
+        elif ds == 'commons-csv':
+            if md == 'model1':
+                rs = 'ROS'
+            elif md == 'model2':
+                rs = 'RUS'
+            elif md == 'model3':
+                rs = 'ADA'
+        elif ds == 'easymock':
+            if md == 'model1':
+                rs = 'ROS'
+            elif md == 'model2':
+                rs = 'ENN'
+            elif md == 'model3':
+                rs = 'ROS'
+        elif ds == 'jgit':
+            if md == 'model1':
+                rs = 'ENN'
+            elif md == 'model2':
+                rs = 'ENN'
+            elif md == 'model3':
+                rs = 'ROS'
+        elif ds == 'Openfire':
+            if md == 'model1':
+                rs = 'ENN'
+            elif md == 'model2':
+                rs = 'ENN'
+            elif md == 'model3':
+                rs = 'ENN'
+    elif algorithm == 'RF':
+        if ds == 'commons-bcel':
+            if md == 'model1':
+                rs = 'ENN'
+            elif md == 'model2':
+                rs = 'ROS'
+            elif md == 'model3':
+                rs = 'NONE'
+        elif ds == 'commons-csv':
+            if md == 'model1':
+                rs = 'RUS'
+            elif md == 'model2':
+                rs = 'RUS'
+            elif md == 'model3':
+                rs = 'ADA'
+        elif ds == 'easymock':
+            if md == 'model1':
+                rs = 'ROS'
+            elif md == 'model2':
+                rs = 'ENN'
+            elif md == 'model3':
+                rs = 'ROS'
+        elif ds == 'jgit':
+            if md == 'model1':
+                rs = 'ROS'
+            elif md == 'model2':
+                rs = 'RUS'
+            elif md == 'model3':
+                rs = 'RUS'
+        elif ds == 'Openfire':
+            if md == 'model1':
+                rs = 'ADA'
+            elif md == 'model2':
+                rs = 'NONE'
+            elif md == 'model3':
+                rs = 'ENN'
+    return rs
+
+def get_train_Xy_resampled(rs, X_train, y_train):
+    if rs == 'RUS':
+        X_train, y_train = RandomUnderSampler(random_state=42).fit_resample(X_train, y_train.values.ravel())
+    elif rs == 'ENN':
+        X_train, y_train = EditedNearestNeighbours().fit_resample(X_train,
+                                                                  y_train.values.ravel())
+    elif rs == 'TL':
+        X_train, y_train = TomekLinks().fit_resample(X_train, y_train.values.ravel())
+    elif rs == 'ROS':
+        ros = RandomOverSampler(random_state=42)
+        X_train, y_train = ros.fit_resample(X_train, y_train)
+    elif rs == 'SMOTE':
+        sm = SMOTE(random_state=42)
+        X_train, y_train = sm.fit_resample(X_train, y_train)
+    elif rs == 'ADA':
+        ada = ADASYN(random_state=42)
+        X_train, y_train = ada.fit_resample(X_train, y_train)
+
+    return [X_train, y_train]
 
 if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
@@ -365,8 +532,8 @@ if __name__ == '__main__':
     # datasets = ['all']
     datasets = ['commons-bcel']
 
-    resamples= ['NONE','RUS','ENN','TL','ROS','SMOTE','ADA']
-    # resamples= ['RUS','ENN','TL','ROS','SMOTE','ADA']
+    resamples = ['NONE', 'RUS', 'ENN', 'TL', 'ROS', 'SMOTE', 'ADA']
+    # resamples = ['RUS','ENN','TL','ROS','SMOTE','ADA']
     # resamples = ['NONE', 'ROS', 'SMOTE', 'ADA']
     # resamples = ['RUS', 'ENN', 'TL']
 
@@ -392,7 +559,7 @@ if __name__ == '__main__':
                           "MaxInheritanceTree", "MaxNesting", "PercentLackOfCohesion", "RatioCommentToCode",
                           "SumCyclomatic", "SumCyclomaticModified", "SumCyclomaticStrict", "SumEssential"]
     evolutionary_metrics = [
-        'BOC', 'TACH', 'FCH', 'LCH', 'CHO', 'FRCH', 'CHD', 'WCH', 'WCD', 'WFR', 'ATAF', 'LCA', 'LCD', 'CSB', 'CSBS',
+        'BOM', 'TACH', 'FCH', 'LCH', 'CHO', 'FRCH', 'CHD', 'WCH', 'WCD', 'WFR', 'ATAF', 'LCA', 'LCD', 'CSB', 'CSBS',
         'ACDF',
     ]
     change_distiller_metrics = [
@@ -431,7 +598,7 @@ if __name__ == '__main__':
 
         # evometrics
         'project', 'commit',
-        'commitprevious', 'release', 'file', 'method', 'BOC', 'TACH', 'FCH', 'LCH', 'CHO',
+        'commitprevious', 'release', 'file', 'method', 'BOM', 'TACH', 'FCH', 'LCH', 'CHO',
         'FRCH', 'CHD', 'WCH', 'WCD', 'WFR', 'ATAF', 'LCA', 'LCD', 'CSB', 'CSBS', 'ACDF',
         # change distiller
         "PROJECT_NAME", "PREVIOUS_COMMIT", "CURRENT_COMMIT", "CLASS_CURRENTCOMMIT", "CLASS_PREVIOUSCOMMIT",
@@ -447,7 +614,8 @@ if __name__ == '__main__':
         "ADDING_ATTRIBUTE_MODIFIABILITY", "REMOVING_ATTRIBUTE_MODIFIABILITY",
         "REMOVING_CLASS_DERIVABILITY", "REMOVING_METHOD_OVERRIDABILITY",
         "ADDING_CLASS_DERIVABILITY", "ADDING_CLASS_DERIVABILITY", "ADDING_METHOD_OVERRIDABILITY",
-        "TOTAL_DECLARATIONPARTCHANGES", "TOTAL_CHANGES", "will_change"
+        "TOTAL_DECLARATIONPARTCHANGES", "TOTAL_CHANGES", "will_change",
+        "perf_change"
     ]
 
     windowsize = [2, 3, 4]
@@ -455,63 +623,76 @@ if __name__ == '__main__':
               {'key': 'model3', 'value': model3}]
     for dataset in datasets:
         for ws in windowsize:
-            for rs in resamples:
-                for model in models:
-                    all_releases_df = pd.read_csv(
-                        '../6.join_metrics/results/' + dataset + '-all-releases.csv')
-                    all_releases_df.columns = main_columns
-                    all_releases_df = all_releases_df.fillna(0)
+            # for rs in resamples:
+            for model in models:
+                all_releases_df = pd.read_csv(
+                    '../6.join_metrics/results/' + dataset + '-all-releases.csv')
+                all_releases_df.columns = main_columns
+                all_releases_df = all_releases_df.fillna(0)
 
-                    X, y = generateStandardTimeSeriesStructure(all_releases_df, ws, model.get('value'))
+                X, y = generateStandardTimeSeriesStructure(all_releases_df, ws, model.get('value'))
 
-                    print("Declaring a dictionary to save results...")
-                    results_dict = dict()
-                    print("... DONE!")
+                print("Declaring a dictionary to save results...")
+                results_dict = dict()
+                print("... DONE!")
 
-                    print("Splitting dataset into train and test sets...")
-                    X_train, X_test, y_train, y_test = train_test_split(
-                        X, y, test_size=0.30, random_state=42)
-                    print("General information:")
-                    print("X Train set:",
-                          X_train.shape[0], "X Test set:", X_test.shape[0])
-                    print("y Train set:",
-                          y_train.shape[0], "y Test set:", y_test.shape[0])
-                    print("... DONE!")
+                print("Splitting dataset into train and test sets...")
+                X_train, X_test, y_train, y_test = train_test_split(
+                    X, y, test_size=0.30, random_state=42)
+                print("General information:")
+                print("X Train set:",
+                      X_train.shape[0], "X Test set:", X_test.shape[0])
+                print("y Train set:",
+                      y_train.shape[0], "y Test set:", y_test.shape[0])
+                print("... DONE!")
 
-                    print("Scaling features...")
-                    scaler = MinMaxScaler()
-                    X_train = scaler.fit_transform(X_train)
-                    X_test = scaler.fit_transform(X_test)
+                print("Scaling features...")
+                scaler = MinMaxScaler()
+                X_train = scaler.fit_transform(X_train)
+                X_test = scaler.fit_transform(X_test)
 
-                    print("... DONE!")
+                print("... DONE!")
 
-                    print("Setting stratified k-fold...")
-                    k = 10
-                    kf = StratifiedKFold(n_splits=k, shuffle=True)
-                    print("k =", k)
-                    print("... DONE!\n")
-                    y_test = pd.DataFrame(y_test)
-                    y_train = pd.DataFrame(y_train)
-                    if rs == 'RUS':
-                        X_train, y_train = RandomUnderSampler(random_state=42).fit_resample(X_train, y_train.values.ravel())
-                    elif rs == 'ENN':
-                        X_train, y_train = EditedNearestNeighbours().fit_resample(X_train,
-                                                                                              y_train.values.ravel())
-                    elif rs == 'TL':
-                        X_train, y_train = TomekLinks().fit_resample(X_train, y_train.values.ravel())
-                    elif rs == 'ROS':
-                        ros = RandomOverSampler(random_state=42)
-                        X_train, y_train = ros.fit_resample(X_train, y_train)
-                    elif rs == 'SMOTE':
-                        sm = SMOTE(random_state=42)
-                        X_train, y_train = sm.fit_resample(X_train, y_train)
-                    elif rs == 'ADA':
-                        ada = ADASYN(random_state=42)
-                        X_train, y_train = ada.fit_resample(X_train, y_train)
+                print("Setting stratified k-fold...")
+                k = 10
+                kf = StratifiedKFold(n_splits=k, shuffle=True)
+                print("k =", k)
+                print("... DONE!\n")
+                y_test = pd.DataFrame(y_test)
+                y_train = pd.DataFrame(y_train)
+                # if rs == 'RUS':
+                #     X_train, y_train = RandomUnderSampler(random_state=42).fit_resample(X_train, y_train.values.ravel())
+                # elif rs == 'ENN':
+                #     X_train, y_train = EditedNearestNeighbours().fit_resample(X_train,
+                #                                                                           y_train.values.ravel())
+                # elif rs == 'TL':
+                #     X_train, y_train = TomekLinks().fit_resample(X_train, y_train.values.ravel())
+                # elif rs == 'ROS':
+                #     ros = RandomOverSampler(random_state=42)
+                #     X_train, y_train = ros.fit_resample(X_train, y_train)
+                # elif rs == 'SMOTE':
+                #     sm = SMOTE(random_state=42)
+                #     X_train, y_train = sm.fit_resample(X_train, y_train)
+                # elif rs == 'ADA':
+                #     ada = ADASYN(random_state=42)
+                #     X_train, y_train = ada.fit_resample(X_train, y_train)
 
-                    #train models
-                    RandomForest_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
-                    DecisionTree_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
-                    LogisticRegr_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
-                    NN_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
-                    # AdaBoost_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
+
+                #train models
+                rs = get_resampling_by_algorithm('RF', dataset, model)
+                X_train, y_train = get_train_Xy_resampled(rs, X_train, y_train)
+                RandomForest_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
+
+                rs = get_resampling_by_algorithm('DT', dataset, model)
+                X_train, y_train = get_train_Xy_resampled(rs, X_train, y_train)
+                DecisionTree_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
+
+                rs = get_resampling_by_algorithm('LR', dataset, model)
+                X_train, y_train = get_train_Xy_resampled(rs, X_train, y_train)
+                LogisticRegr_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
+
+                rs = get_resampling_by_algorithm('MLP', dataset, model)
+                X_train, y_train = get_train_Xy_resampled(rs, X_train, y_train)
+                NN_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
+
+                # AdaBoost_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
