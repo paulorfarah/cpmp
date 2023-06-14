@@ -162,52 +162,52 @@ def RandomForest_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     if dataset == 'commons-bcel':
         if model == 'model1':
             parameters = {
-                'n_estimators': 1577,
-                'max_depth': 30,
+                'n_estimators': [1577],
+                'max_depth': [30],
             }
         elif model == 'model2':
             parameters = {
-                'n_estimators': 1366,
-                'max_depth': 30,
+                'n_estimators': [1366],
+                'max_depth': [30],
             }
         elif model == 'model3':
             parameters = {
-                'n_estimators': 311,
-                'max_depth': 10,
+                'n_estimators': [311],
+                'max_depth': [10],
             }
     elif dataset == 'commons-csv':
         if model == 'model1':
             parameters = {
-                'n_estimators': 311,
-                'max_depth': 20,
+                'n_estimators': [311],
+                'max_depth': [20],
             }
         elif model == 'model2':
             parameters = {
-                'n_estimators': 100,
-                'max_depth': 30,
+                'n_estimators': [100],
+                'max_depth': [30],
             }
     elif dataset == 'easymock':
         if model == 'model2':
             parameters = {
-                'n_estimators': 1788,
-                'max_depth': 40,
+                'n_estimators': [1788],
+                'max_depth': [40],
             }
     elif dataset == 'jgit':
         if model == 'model2':
             parameters = {
-                'n_estimators': 311,
-                'max_depth': 10,
+                'n_estimators': [311],
+                'max_depth': [10],
             }
         elif model == 'model3':
             parameters = {
-                'n_estimators': 1577,
-                'max_depth': 20,
+                'n_estimators': [1577],
+                'max_depth': [20],
             }
     elif dataset == 'Openfire':
         if model == 'model3':
             parameters = {
-                'n_estimators': 100,
-                'max_depth': 10,
+                'n_estimators': [100],
+                'max_depth': [10],
             }
     c = RandomForestClassifier(random_state=42, class_weight='balanced', n_estimators=100, n_jobs=-1)
     create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest, 'RandomForest', dataset, rs, model, ws)
@@ -226,52 +226,52 @@ def NN_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     if dataset == 'commons-bcel':
         parameters = {
                 'hidden_layer_sizes': (50, 50),
-                'activation': 'relu',
-                'solver': 'adam',
-                'learning_rate': 'constant',
+                'activation': ['relu'],
+                'solver': ['adam'],
+                'learning_rate': ['constant'],
             }
 
     if dataset == 'commons-csv':
         if model == 'model2':
             parameters = {
                 'hidden_layer_sizes': (50, 50),
-                'activation': 'relu',
-                'solver': 'adam',
-                'learning_rate': 'constant',
+                'activation': ['relu'],
+                'solver': ['adam'],
+                'learning_rate': ['constant'],
             }
 
     if dataset == 'easymock':
         if model == 'model2':
             parameters = {
                 'hidden_layer_sizes': (50, 50),
-                'activation': 'relu',
-                'solver': 'adam',
-                'learning_rate': 'constant',
+                'activation': ['relu'],
+                'solver': ['adam'],
+                'learning_rate': ['constant'],
             }
 
     if dataset == 'jgit':
         if model == 'model1' or model == 'model2':
             parameters = {
                 'hidden_layer_sizes': (50, 50),
-                'activation': 'relu',
-                'solver': 'adam',
-                'learning_rate': 'constant',
+                'activation': ['relu'],
+                'solver': ['adam'],
+                'learning_rate': ['constant'],
             }
 
     if dataset == 'Openfire':
         if model == 'model1' or model == 'model2':
             parameters = {
                 'hidden_layer_sizes': (50, 50),
-                'activation': 'relu',
-                'solver': 'adam',
-                'learning_rate': 'constant',
+                'activation': ['relu'],
+                'solver': ['adam'],
+                'learning_rate': ['constant'],
             }
         if model == 'model3':
             parameters = {
                 'hidden_layer_sizes': (100, ),
-                'activation': 'tanh',
-                'solver': 'sgd',
-                'learning_rate': 'constant',
+                'activation': ['tanh'],
+                'solver': ['sgd'],
+                'learning_rate': ['constant'],
             }
     c = MLPClassifier(random_state=42)
     create_model(c, parameters, kf, Xtrain, Xtest, Ytrain, Ytest, 'MLP', dataset, rs, model, ws)
@@ -284,27 +284,27 @@ def DecisionTree_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     parameters = {}
     if dataset == 'commons-bcel':
         if model == 'model3':
-            parameters = {'max_depth': 4}
+            parameters = {'max_depth': [4]}
         else:
-            parameters = {'max_depth': 10}
+            parameters = {'max_depth': [10]}
 
     if dataset == 'commons-csv':
         if model == 'model2':
-            parameters = {'max_depth': 10}
+            parameters = {'max_depth': [10]}
 
     if dataset == 'easymock':
         if model == 'model2':
-            parameters = {'max_depth': 10}
+            parameters = {'max_depth': [10]}
 
     if dataset == 'jgit':
         if model == 'model1':
-            parameters = {'max_depth': 10}
+            parameters = {'max_depth': [10]}
 
     if dataset == 'Openfire':
         if model == 'model1':
-            parameters = {'max_depth': 9}
+            parameters = {'max_depth': [9]}
         if model == 'model3':
-            parameters = {'max_depth': 5}
+            parameters = {'max_depth': [5]}
 
     # parameters = {'max_depth': range(1, 11, 2)}
     c = DecisionTreeClassifier(random_state=42, class_weight='balanced')
@@ -626,7 +626,12 @@ if __name__ == '__main__':
             # for rs in resamples:
             for model in models:
                 all_releases_df = pd.read_csv(
-                    '../6.join_metrics/results/' + dataset + '-all-releases.csv')
+                '../6.join_metrics/results/' + dataset + '-perf-diff-all.csv', index_col=False)
+
+                # all_releases_df = all_releases_df.reset_index()
+
+                all_releases_df.drop(columns=all_releases_df.columns[0], axis = 1, inplace= True)
+
                 all_releases_df.columns = main_columns
                 all_releases_df = all_releases_df.fillna(0)
 
@@ -681,18 +686,22 @@ if __name__ == '__main__':
                 #train models
                 rs = get_resampling_by_algorithm('RF', dataset, model)
                 X_train, y_train = get_train_Xy_resampled(rs, X_train, y_train)
+                y_train = y_train.values.ravel()
                 RandomForest_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
 
                 rs = get_resampling_by_algorithm('DT', dataset, model)
                 X_train, y_train = get_train_Xy_resampled(rs, X_train, y_train)
+                # y_train = y_train.values.ravel()
                 DecisionTree_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
 
                 rs = get_resampling_by_algorithm('LR', dataset, model)
                 X_train, y_train = get_train_Xy_resampled(rs, X_train, y_train)
+                # y_train = y_train.values.ravel()
                 LogisticRegr_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
 
                 rs = get_resampling_by_algorithm('MLP', dataset, model)
                 X_train, y_train = get_train_Xy_resampled(rs, X_train, y_train)
+                # y_train = y_train.values.ravel()
                 NN_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
 
                 # AdaBoost_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
