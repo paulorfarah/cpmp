@@ -52,7 +52,7 @@ def plot_confusion_matrix(cm, dataset,
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
     plt.tight_layout()
-    plt.savefig('results/cpmp/cf-' + dataset + '.png')
+    plt.savefig('results/perf/cf-' + dataset + '.png')
     plt.close()
 
 
@@ -123,13 +123,6 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws, params=[]):
     writer = csv.writer(f)
     writer.writerow(scores)
     f.close()
-
-    # if params:
-    #     params = scores.append(params)
-    #     f = open("results/cpmp/" + dataset + "-hist-params.csv", "a")
-    #     writer = csv.writer(f)
-    #     writer.writerow(params)
-    #     f.close()
 
     return scores
 
@@ -530,7 +523,7 @@ if __name__ == '__main__':
 
     # datasets = ['commons-bcel','commons-io','junit4','pdfbox','wro4j']
     # datasets = ['all']
-    datasets = ['commons-bcel']
+    datasets = ['Openfire']
 
     resamples = ['NONE', 'RUS', 'ENN', 'TL', 'ROS', 'SMOTE', 'ADA']
     # resamples = ['RUS','ENN','TL','ROS','SMOTE','ADA']
