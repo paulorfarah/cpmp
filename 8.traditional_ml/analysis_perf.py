@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 
 import pandas as pd
 import seaborn as sns
@@ -48,6 +49,35 @@ def best_scores():
     # print(res.head())
     scores.to_csv('results/cpmp/best_auc.csv', index=False)
 
+
+def best_scores_perf():
+    datasets = ['commons-bcel', 'commons-csv', 'easymock', 'jgit', 'Openfire']
+    algs = ['DT', 'LogisticRegression', 'MLP', 'RandomForest']
+    models = ['model1', 'model2', 'model3']
+    scores = pd.DataFrame(columns=['AP', 'MS', 'F1', 'Acc', 'Sen', 'AUC', 'RS', 'F1', 'Acc', 'Sen', 'AUC', 'RS'
+        , 'F1', 'Acc', 'Sen', 'AUC', 'RS', 'F1', 'Acc', 'Sen', 'AUC', 'RS'])
+    for dataset in datasets:
+        print(dataset)
+        df = pd.read_csv('results/perf/' + dataset + '-results-traditional-no-feature-selection-model1-3-perf.csv')
+        for model in models:
+            row_res = [dataset, model]
+            for alg in algs:
+                try:
+                    id = df[(df['Algoritm'] == alg) & (df['model'] == model)]['ROC AUC score'].idxmax()
+                    row = df.iloc[[id]]
+                    f1 = row['F1-Score(None)'].values[0].split(' ', 1)[0].replace('[', '')
+                    acc = row['Accuracy'].values[0]
+                    sen = row['Sensitivity'].values[0]
+                    auc = row['ROC AUC score'].values[0]
+                    res = row['resample'].values[0]
+                    row_res += [f1, acc, sen, auc, res]
+                except:
+                    print('ERROR: ' + str(sys.exc_info()))
+                    row_res += [0, 0, 0, 0, 0]
+            scores.loc[len(scores)] = row_res
+    # print(res.head())
+    Path("results/perf").mkdir(parents=True, exist_ok=True)
+    scores.to_csv('results/perf/best_auc_perf.csv', index=False)
 
 def plot_boxplot_best_auc():
     df = pd.read_csv('results/cpmp/best_auc.csv')
@@ -133,4 +163,6 @@ if __name__ == '__main__':
     # best_scores()
     # plot_boxplot_best_auc()
     # plot_boxplot_all()
-    resampling_results()
+    # resampling_results()
+
+    best_scores_perf()
