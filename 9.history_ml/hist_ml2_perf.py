@@ -119,7 +119,7 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws, params=[]):
         writer.writerow(head)
         f.close()
 
-    f = open("results/perf/" + dataset + "-hist-model1-3.csv-perf", "a")
+    f = open("results/perf/" + dataset + "-hist-model1-3-perf.csv", "a")
     writer = csv.writer(f)
     writer.writerow(scores)
     f.close()
