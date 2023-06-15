@@ -677,22 +677,22 @@ if __name__ == '__main__':
 
 
                 #train models
-                rs = get_resampling_by_algorithm('RF', dataset, model)
+                rs = get_resampling_by_algorithm('RF', dataset, model.get('key'))
                 X_train, y_train = get_train_Xy_resampled(rs, X_train, y_train)
                 y_train = y_train.values.ravel()
                 RandomForest_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
 
-                rs = get_resampling_by_algorithm('DT', dataset, model)
+                rs = get_resampling_by_algorithm('DT', dataset, model.get('key'))
                 X_train, y_train = get_train_Xy_resampled(rs, X_train, y_train)
                 # y_train = y_train.values.ravel()
                 DecisionTree_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
 
-                rs = get_resampling_by_algorithm('LR', dataset, model)
+                rs = get_resampling_by_algorithm('LR', dataset, model.get('key'))
                 X_train, y_train = get_train_Xy_resampled(rs, X_train, y_train)
                 # y_train = y_train.values.ravel()
                 LogisticRegr_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
 
-                rs = get_resampling_by_algorithm('MLP', dataset, model)
+                rs = get_resampling_by_algorithm('MLP', dataset, model.get('key'))
                 X_train, y_train = get_train_Xy_resampled(rs, X_train, y_train)
                 # y_train = y_train.values.ravel()
                 NN_(X_train, y_train, X_test, y_test, dataset, rs, model.get('key'), ws)
