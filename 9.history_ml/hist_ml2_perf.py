@@ -496,12 +496,12 @@ def get_resampling_by_algorithm(algorithm, ds, md):
 
 def get_train_Xy_resampled(rs, X_train, y_train):
     if rs == 'RUS':
-        X_train, y_train = RandomUnderSampler(random_state=42).fit_resample(X_train, y_train.values.ravel())
+        X_train, y_train = RandomUnderSampler(random_state=42).fit_resample(X_train, y_train)
     elif rs == 'ENN':
         X_train, y_train = EditedNearestNeighbours().fit_resample(X_train,
-                                                                  y_train.values.ravel())
+                                                                  y_train)
     elif rs == 'TL':
-        X_train, y_train = TomekLinks().fit_resample(X_train, y_train.values.ravel())
+        X_train, y_train = TomekLinks().fit_resample(X_train, y_train)
     elif rs == 'ROS':
         ros = RandomOverSampler(random_state=42)
         X_train, y_train = ros.fit_resample(X_train, y_train)
