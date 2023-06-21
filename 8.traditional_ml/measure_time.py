@@ -1,6 +1,7 @@
 import csv
 import itertools
 import os
+import time
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -119,20 +120,20 @@ def get_scores(y_test, y_pred, dataset, algorithm, rs, model, ws):
     print("ROC AUC score: " + str(scores[-1]))
 
     scores.append([tn, fp, fn, tp])
-    head = ['Dataset', 'Algoritm', 'window', 'model', 'resample', 'F1-Score(micro)', 'F1-Score(macro)',
-            'F1-Score(weighted)', 'F1-Score(None)', 'Accuracy', 'precision', 'Sensitivity', 'Specificity', 'ROC AUC score',
-            'Confusion matrix']
+    # head = ['Dataset', 'Algoritm', 'window', 'model', 'resample', 'F1-Score(micro)', 'F1-Score(macro)',
+    #         'F1-Score(weighted)', 'F1-Score(None)', 'Accuracy', 'precision', 'Sensitivity', 'Specificity', 'ROC AUC score',
+    #         'Confusion matrix']
 
-    if not os.path.exists('results/cpmp/' + dataset + '-results-tradicional-no-feature-selection-model1-3.csv'):
-        f = open("results/cpmp/" + dataset + "-results-tradicional-no-feature-selection-model1-3.csv", "a")
-        writer = csv.writer(f)
-        writer.writerow(head)
-        f.close()
+    # if not os.path.exists('results/cpmp/' + dataset + '-results-tradicional-no-feature-selection-model1-3.csv'):
+    #     f = open("results/cpmp/" + dataset + "-results-tradicional-no-feature-selection-model1-3.csv", "a")
+    #     writer = csv.writer(f)
+    #     writer.writerow(head)
+    #     f.close()
 
-    f = open("results/cpmp/" + dataset + "-results-tradicional-no-feature-selection-model1-3.csv", "a")
-    writer = csv.writer(f)
-    writer.writerow(scores)
-    f.close()
+    # f = open("results/cpmp/" + dataset + "-results-tradicional-no-feature-selection-model1-3.csv", "a")
+    # writer = csv.writer(f)
+    # writer.writerow(scores)
+    # f.close()
 
     return scores
 
@@ -197,9 +198,9 @@ def LogisticRegr_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     print("\nLOGISTIC REGRESSION")
     cv_score = []
     i = 1
-    print("TRAIN AND VALIDATION SETS:")
+    # print("TRAIN AND VALIDATION SETS:")
     for train_index, test_index in kf.split(Xtrain, Ytrain):
-        print('{} of KFold {}'.format(i, kf.n_splits))
+        # print('{} of KFold {}'.format(i, kf.n_splits))
         xtr_LR, xvl_LR = Xtrain.iloc[train_index], Xtrain.iloc[test_index]
         ytr_LR, yvl_LR = Ytrain.iloc[train_index], Ytrain.iloc[test_index]
 
@@ -207,15 +208,15 @@ def LogisticRegr_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
         lr = LogisticRegression(solver='lbfgs', random_state=42, class_weight='balanced', n_jobs=-1)
         lr.fit(xtr_LR, ytr_LR.values.ravel())
         score = roc_auc_score(yvl_LR, lr.predict(xvl_LR))
-        print('ROC AUC score:', score)
+        # print('ROC AUC score:', score)
         cv_score.append(score)
         i += 1
 
-    print('\nCROSS VALIDANTION SUMMARY:')
-    print('Mean: ' + str(np.mean(cv_score)))
-    print('Std deviation: ' + str(np.std(cv_score)))
+    # print('\nCROSS VALIDANTION SUMMARY:')
+    # print('Mean: ' + str(np.mean(cv_score)))
+    # print('Std deviation: ' + str(np.std(cv_score)))
 
-    print("\nTEST SET:")
+    # print("\nTEST SET:")
     get_scores(Ytest, lr.predict(Xtest), dataset, "LogisticRegression", rs, model, ws)
 
 
@@ -223,9 +224,9 @@ def RandomForest_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     print("RANDOM FOREST")
     cv_score = []
     i = 1
-    print("TRAIN AND VALIDATION SETS:")
+    # print("TRAIN AND VALIDATION SETS:")
     for train_index, test_index in kf.split(Xtrain, Ytrain):
-        print('{} of KFold {}'.format(i, kf.n_splits))
+        # print('{} of KFold {}'.format(i, kf.n_splits))
         xtr_RF, xvl_RF = Xtrain.iloc[train_index], Xtrain.iloc[test_index]
         ytr_RF, yvl_RF = Ytrain.iloc[train_index], Ytrain.iloc[test_index]
 
@@ -233,15 +234,15 @@ def RandomForest_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
         rf = RandomForestClassifier(random_state=42, class_weight='balanced', n_estimators=100, n_jobs=-1)
         rf.fit(xtr_RF, ytr_RF.values.ravel())
         score = roc_auc_score(yvl_RF, rf.predict(xvl_RF))
-        print('ROC AUC score:', score)
+        # print('ROC AUC score:', score)
         cv_score.append(score)
         i += 1
 
-    print('\nCROSS VALIDANTION SUMMARY:')
-    print('Mean: ' + str(np.mean(cv_score)))
-    print('Std deviation: ' + str(np.std(cv_score)))
+    # print('\nCROSS VALIDANTION SUMMARY:')
+    # print('Mean: ' + str(np.mean(cv_score)))
+    # print('Std deviation: ' + str(np.std(cv_score)))
 
-    print("\nTEST SET:")
+    # print("\nTEST SET:")
     get_scores(Ytest, rf.predict(Xtest), dataset, "RandomForest", rs, model, ws)
 
 
@@ -249,9 +250,9 @@ def NN_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     print("NEURAL NETWORK")
     cv_score = []
     i = 1
-    print("TRAIN AND VALIDATION SETS:")
+    # print("TRAIN AND VALIDATION SETS:")
     for train_index, test_index in kf.split(Xtrain, Ytrain):
-        print('{} of KFold {}'.format(i, kf.n_splits))
+        # print('{} of KFold {}'.format(i, kf.n_splits))
         xtr_NN, xvl_NN = Xtrain.iloc[train_index], Xtrain.iloc[test_index]
         ytr_NN, yvl_NN = Ytrain.iloc[train_index], Ytrain.iloc[test_index]
 
@@ -263,15 +264,15 @@ def NN_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
         grid.fit(xtr_NN, ytr_NN.values.ravel())
         score = roc_auc_score(yvl_NN, grid.predict(xvl_NN))
         # score = roc_auc_score(yvl_NN, nn.predict(xvl_NN))
-        print('ROC AUC score:', score)
+        # print('ROC AUC score:', score)
         cv_score.append(score)
         i += 1
 
-    print('\nCROSS VALIDANTION SUMMARY:')
-    print('Mean: ' + str(np.mean(cv_score)))
-    print('Std deviation: ' + str(np.std(cv_score)))
+    # print('\nCROSS VALIDANTION SUMMARY:')
+    # print('Mean: ' + str(np.mean(cv_score)))
+    # print('Std deviation: ' + str(np.std(cv_score)))
 
-    print("\nTEST SET:")
+    # print("\nTEST SET:")
     get_scores(Ytest, grid.predict(Xtest), dataset, "MLP", rs, model, ws)
 
 
@@ -279,10 +280,10 @@ def DecisionTree_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
     print("\nDECISION TREE")
     cv_score = []
     i = 1
-    print("TRAIN AND VALIDATION SETS:")
+    # print("TRAIN AND VALIDATION SETS:")
     parameters = {'max_depth': range(1, 11)}
     for train_index, test_index in kf.split(Xtrain, Ytrain):
-        print('{} of KFold {}'.format(i, kf.n_splits))
+        # print('{} of KFold {}'.format(i, kf.n_splits))
         xtr_DT, xvl_DT = Xtrain.iloc[train_index], Xtrain.iloc[test_index]
         ytr_DT, yvl_DT = Ytrain.iloc[train_index], Ytrain.iloc[test_index]
 
@@ -295,15 +296,15 @@ def DecisionTree_(Xtrain, Ytrain, Xtest, Ytest, dataset, rs, model, ws):
         grid.fit(xtr_DT, ytr_DT.values.ravel())
         score = roc_auc_score(yvl_DT, grid.predict(xvl_DT))
         # score = roc_auc_score(yvl_DT, dt.predict(xvl_DT))
-        print('ROC AUC score:', score)
+        # print('ROC AUC score:', score)
         cv_score.append(score)
         i += 1
 
-    print('\nCROSS VALIDANTION SUMMARY:')
-    print('Mean: ' + str(np.mean(cv_score)))
-    print('Std deviation: ' + str(np.std(cv_score)))
+    # print('\nCROSS VALIDANTION SUMMARY:')
+    # print('Mean: ' + str(np.mean(cv_score)))
+    # print('Std deviation: ' + str(np.std(cv_score)))
 
-    print("\nTEST SET:")
+    # print("\nTEST SET:")
     get_scores(Ytest, grid.predict(Xtest), dataset, "DT", rs, model, ws)
 
 
@@ -350,7 +351,7 @@ if __name__ == '__main__':
 
     # datasets = ['commons-bcel','commons-io','junit4','pdfbox','wro4j']
     dataset_list = ['commons-bcel', 'commons-csv', 'commons-io', 'easymock', 'jgit', 'junit4', 'pdfbox', 'wro4j']
-    datasets = ['jgit']
+    datasets = ['Openfire']
 
     main_columns = [
         # ck
@@ -400,12 +401,14 @@ if __name__ == '__main__':
 
     # resamples= ['NONE','RUS','ENN','TL','ROS','SMOTE','ADA']
     # resamples= ['RUS','ENN','TL','ROS','SMOTE','ADA']
-    resamples = ['NONE', 'ROS', 'SMOTE', 'ADA']
-    # 
+    # resamples = ['NONE', 'ROS', 'SMOTE', 'ADA']
+    #
     # resamples = ['RUS', 'ENN', 'TL']
+    resamples = ['ROS']
     windowsize = [0]
-    models = [{'key': 'model1', 'value': model1}, {'key': 'model2', 'value': model2},
-              {'key': 'model3', 'value': model3}]
+    # models = [{'key': 'model1', 'value': model1}, {'key': 'model2', 'value': model2},
+    #           {'key': 'model3', 'value': model3}]
+    models = [{'key': 'model2', 'value': model2}]
     # models = [{'key':'model4', 'value': model4}, {'key': 'model6', 'value': model6}, {'key': 'model7', 'value': model7}]
     for dataset in datasets:
         for ws in windowsize:
@@ -436,38 +439,38 @@ if __name__ == '__main__':
                     #   print(new_features)
 
                     # X, y = generateStandardTimeSeriesStructure(all_releases_df, ws, new_features)
-                    print("Filtering required columns into X features...")
+                    # print("Filtering required columns into X features...")
                     X = all_releases_df[model.get('value')].copy()
                     print("... DONE!")
 
-                    print("Setting y column containing label of change-proneness...")
+                    # print("Setting y column containing label of change-proneness...")
                     y = pd.DataFrame(all_releases_df.loc[:, 'will_change'])
-                    print("... DONE!")
-                    print("Declaring a dictionary to save results...")
+                    # print("... DONE!")
+                    # print("Declaring a dictionary to save results...")
                     results_dict = dict()
-                    print("... DONE!")
+                    # print("... DONE!")
 
-                    print("Splitting dataset into train and test sets...")
+                    # print("Splitting dataset into train and test sets...")
                     X_train, X_test, y_train, y_test = train_test_split(
                         X, y, test_size=0.30, random_state=42)
-                    print("General information:")
-                    print("X Train set:",
-                          X_train.shape[0], "X Test set:", X_test.shape[0])
-                    print("y Train set:",
-                          y_train.shape[0], "y Test set:", y_test.shape[0])
-                    print("... DONE!")
+                    # print("General information:")
+                    # print("X Train set:",
+                    #       X_train.shape[0], "X Test set:", X_test.shape[0])
+                    # print("y Train set:",
+                    #       y_train.shape[0], "y Test set:", y_test.shape[0])
+                    # print("... DONE!")
 
-                    print("Scaling features...")
+                    # print("Scaling features...")
                     scaler = MinMaxScaler()
                     X_train = pd.DataFrame(scaler.fit_transform(X_train))
                     X_test = pd.DataFrame(scaler.fit_transform(X_test))
-                    print("... DONE!")
+                    # print("... DONE!")
 
-                    print("Setting stratified k-fold...")
+                    # print("Setting stratified k-fold...")
                     k = 10
                     kf = StratifiedKFold(n_splits=k, shuffle=False)
-                    print("k =", k)
-                    print("... DONE!\n")
+                    # print("k =", k)
+                    # print("... DONE!\n")
                     y_test = pd.DataFrame(y_test)
                     y_train = pd.DataFrame(y_train)
 
@@ -502,12 +505,26 @@ if __name__ == '__main__':
                         NN_(X_TL, y_TL, X_test, y_test, dataset, rs, model.get('key'), ws)
                     # OVERSAMPLING 'ROS','SMOTE','ADA'
                     if rs == 'ROS':
+                        start_time = time.time()
                         ros = RandomOverSampler(random_state=42)
                         X_ROS, y_ROS = ros.fit_resample(X_train, y_train)
+                        print("--- %sROS seconds ---" % (time.time() - start_time))
+
+                        start_time = time.time()
                         DecisionTree_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        print("--- %sDT seconds ---" % (time.time() - start_time))
+
+                        start_time = time.time()
                         RandomForest_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        print("--- %sRF seconds ---" % (time.time() - start_time))
+
+                        start_time = time.time()
                         LogisticRegr_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        print("--- %sLR seconds ---" % (time.time() - start_time))
+
+                        start_time = time.time()
                         NN_(X_ROS, y_ROS, X_test, y_test, dataset, rs, model.get('key'), ws)
+                        print("--- %sNN seconds ---" % (time.time() - start_time))
                     if rs == 'SMOTE':
                         sm = SMOTE(random_state=42)
                         X_SMO, y_SMO = sm.fit_resample(X_train, y_train)

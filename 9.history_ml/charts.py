@@ -1,22 +1,29 @@
 import pandas as pd
 from matplotlib import pyplot as plt
 pd.set_option('display.max_columns', None)
-metrics = ['F1-Score']#, 'Accuracy', 'Sensitivity', 'Specificity', 'ROC AUC score']
+metrics = ['F1', 'Acc', 'Sen', 'ROC']
 for metric in metrics:
-    df = pd.read_csv('results/resultadospormodelo.csv', decimal=",")
+    df = pd.read_csv('results/cpmp/best_auc_trad_slw_win.csv', decimal=",")
     print(df.columns)
-    df.columns = ['Dataset', 'Algoritm', 'window', 'model', 'resample', 'F1-Score(micro)',
-       'F1-Score(macro)', 'F1-Score', 'F1-Score(None)', 'Accuracy',
-       'Sensitivity', 'Specificity', 'ROC AUC score', 'Confusion matrix']
+    df['F1'] = pd.to_numeric(df['F1'], errors='raise')
+    df['Acc'] = pd.to_numeric(df['Acc'], errors='raise')
+    df['Sen'] = pd.to_numeric(df['Sen'], errors='raise')
+    df['ROC'] = pd.to_numeric(df['AUC'], errors='raise')
+    # df.columns = ['Dataset', 'Algoritm', 'window', 'model', 'resample', 'F1-Score(micro)',
+    #    'F1-Score(macro)', 'F1-Score', 'F1-Score(None)', 'Accuracy',
+    #    'Sensitivity', 'Specificity', 'ROC AUC score', 'Confusion matrix']
+    # df.columns = ['Proj', 'Fs', 'App', 'F1', 'Acc', 'Sen', 'AUC', 'RS', 'F1' ,'Acc', 'Sen' , 'AUC',
+    #               'RS', 'F1', 'Acc', 'Sen', 'AUC', 'RS', 'F1', 'Acc', 'Sen', 'AUC', 'RS']
     print('######### ' + metric)
 
     # approach
-    dfApp = df.query("model == 'model1'")
+
+    # all feature sets
+    # dfApp = df.query("Fs == 'Str'")
     # dfApp['window'] = dfApp['window'].replace({0: 'trad', 3: 'our'})
     # dfAvg = dfApp.groupby(['Dataset', 'window'])[metric].mean()
-    # print(dfAvg)
-    print(dfApp.head)
-    ax = pd.pivot_table(dfApp, index='Dataset', columns='window', values=metric).plot.bar(alpha=0.75, rot=0)
+
+    ax = pd.pivot_table(df, index='Proj', columns='App', values=metric).plot.bar(alpha=0.75, rot=0)
     # ax = pd.pivot_table(dfApp, index='Dataset', columns='window')[metric].plot.bar(alpha=0.75, rot=0)
 
     # for p in ax.patches:
@@ -24,177 +31,150 @@ for metric in metrics:
     ax.set_ylabel(metric)
     ax.set_xlabel('')
     plt.legend(title='Approach', loc='lower right')
-    plt.savefig('results/window-set1'+metric+'.pdf')
+    plt.xticks(rotation=45, ha='right')
+    plt.subplots_adjust(bottom=0.2)
+    plt.savefig('results/charts/window-all-' + metric + '.pdf')
+    # plt.show()
+
+    # Str
+    dfApp = df.query("Fs == 'Str'")
+    # dfApp['window'] = dfApp['window'].replace({0: 'trad', 3: 'our'})
+    # dfAvg = dfApp.groupby(['Dataset', 'window'])[metric].mean()
+
+
+
+    ax = pd.pivot_table(dfApp, index='Proj', columns='App', values=metric).plot.bar(alpha=0.75, rot=0)
+    # ax = pd.pivot_table(dfApp, index='Dataset', columns='window')[metric].plot.bar(alpha=0.75, rot=0)
+
+    # for p in ax.patches:
+    #     ax.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
+    ax.set_ylabel(metric)
+    ax.set_xlabel('')
+    plt.legend(title='Approach', loc='lower right')
+    plt.xticks(rotation=45, ha='right')
+    plt.subplots_adjust(bottom=0.2)
+    plt.savefig('results/charts/window-Str-'+metric+'.pdf')
     # plt.show()
 
     # -- set 2
-    dfApp = df.query("model == 'model2'")
-    dfApp['window'] = dfApp['window'].replace({0: 'trad', 3: 'our'})
+    dfApp = df.query("Fs == 'StrEvo'")
+    # dfApp['window'] = dfApp['window'].replace({0: 'trad', 3: 'our'})
     # dfAvg = dfApp.groupby(['Dataset', 'window'])[metric].mean()
     # print(dfAvg)
+    dfApp['F1'] = pd.to_numeric(dfApp['F1'], errors='raise')
+    dfApp['Acc'] = pd.to_numeric(dfApp['Acc'], errors='raise')
+    dfApp['Sen'] = pd.to_numeric(dfApp['Sen'], errors='raise')
+    dfApp['AUC'] = pd.to_numeric(dfApp['AUC'], errors='raise')
 
-    ax = pd.pivot_table(dfApp, index='Dataset', columns='window')[metric].plot.bar(alpha=0.75, rot=0)
+    ax = pd.pivot_table(dfApp, index='Proj', columns='App', values=metric).plot.bar(alpha=0.75, rot=0)
     # for p in ax.patches:
     #     ax.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
     ax.set_ylabel(metric)
     ax.set_xlabel('')
     plt.legend(title='Approach', loc='lower right')
-    plt.savefig('results/window-set2'+metric+'.pdf')
-
-    # # -- set 6
-    # dfApp = df.query("model == 'model6'")
-    # dfApp['window'] = dfApp['window'].replace({0: 'trad', 3: 'our'})
-    # # dfAvg = dfApp.groupby(['Dataset', 'window'])[metric].mean()
-    # # print(dfAvg)
-    #
-    # ax = pd.pivot_table(dfApp, index='Dataset', columns='window')[metric].plot.bar(alpha=0.75, rot=0)
-    # # for p in ax.patches:
-    # #     ax.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
-    # ax.set_ylabel(metric)
-    # ax.set_xlabel('')
-    # plt.legend(title='Approach', loc='lower right')
-    # plt.savefig('results/window-set6'+metric+'.pdf')
-
-    #  # -- set 7
-    # dfApp = df.query("model == 'model7'")
-    # dfApp['window'] = dfApp['window'].replace({0: 'trad', 3: 'our'})
-    # # dfAvg = dfApp.groupby(['Dataset', 'window'])[metric].mean()
-    # # print(dfAvg)
-    #
-    # ax = pd.pivot_table(dfApp, index='Dataset', columns='window')[metric].plot.bar(alpha=0.75, rot=0)
-    # # for p in ax.patches:
-    # #     ax.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
-    # ax.set_ylabel(metric)
-    # ax.set_xlabel('')
-    # plt.legend(title='Approach', loc='lower right')
-    # plt.savefig('results/window-set7'+metric+'.pdf')
+    plt.xticks(rotation=45, ha='right')
+    plt.subplots_adjust(bottom=0.2)
+    plt.savefig('results/charts/window-StrEvo-'+metric+'.pdf')
 
 
-    dfApp['window'] = df['window'].replace({0: 'trad', 3: 'our'})
+    # dfApp['App'] = df['App'].replace({0: 'trad', 3: 'our'})
     # dfAvg = dfApp.groupby(['Dataset', 'window'])[metric].mean()
     # print(dfAvg)
 
-    ax = pd.pivot_table(dfApp, index='Dataset', columns='window')[metric].plot.bar(alpha=0.75, rot=0)
+    ax = pd.pivot_table(dfApp, index='Proj', columns='App', values=metric).plot.bar(alpha=0.75, rot=0)
     # for p in ax.patches:
     #     ax.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
     ax.set_ylabel(metric)
     ax.set_xlabel('')
     plt.legend(title='Approach', loc='lower right')
-    plt.savefig('results/window-sets1_2_6_7'+metric+'.pdf')
+    plt.xticks(rotation=45, ha='right')
+    plt.subplots_adjust(bottom=0.2)
+    plt.savefig('results/charts/window-sets1_2_6_7'+metric+'.pdf')
 
     # feature sets
-    dfSet = df.query("window == 3")
-    dfSet['model'] = dfSet['model'].replace({'model1': 'set1', 'model2': 'set2','model3': 'set3','model4': 'set4','model6': 'set5','model7': 'set6'})
-    dfAvg = dfSet.groupby(['Dataset', 'model'])[metric].mean()
+    dfSet = df.query("App == 'slw'")
+    print(dfSet.dtypes)
+    dfSet['F1'] = pd.to_numeric(dfSet['F1'], errors='raise')
+    dfSet['Acc'] = pd.to_numeric(dfSet['Acc'], errors='raise')
+    dfSet['Sen'] = pd.to_numeric(dfSet['Sen'], errors='raise')
+    dfSet['AUC'] = pd.to_numeric(dfSet['AUC'], errors='raise')
+    # dfSet['Fs'] = dfSet['Fs'].replace({'model1': 'set1', 'model2': 'set2','model3': 'set3','model4': 'set4','model6': 'set5','model7': 'set6'})
+    dfAvg = dfSet.groupby(['Proj', 'Fs'])[metric].mean()
     # print(dfAvg)
 
-    ax = pd.pivot_table(dfSet, index='Dataset', columns='model')[metric].plot.bar(alpha=0.75, rot=0)
+    ax = pd.pivot_table(dfSet, index='Proj', columns='Fs', values=metric).plot.bar(alpha=0.75, rot=0)
     # for p in ax.patches:
     #     ax.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
     ax.set_ylabel(metric)
     ax.set_xlabel('')
     plt.legend(loc='lower right')
-    plt.savefig('results/sets'+metric+'.pdf')
+    plt.xticks(rotation=45, ha='right')
+    plt.subplots_adjust(bottom=0.2)
+    plt.savefig('results/charts/sets'+metric+'.pdf')
 
 
     #algorithms
-    dfAlg = df.query("window == 3")
-    dfAlg = dfAlg.query("model == 'model1'")
+    dfAlg = df.query("App == 'slw'")
+    dfAlg = dfAlg.query("Fs == 'Str'")
     # dfSet['window'] = dfSet['window'].replace({0: 'trad', 3: 'our'})
-    dfAvg = dfAlg.groupby(['Dataset', 'Algoritm'])[metric].mean()
+    dfAvg = dfAlg.groupby(['Proj', 'Algorithm'])[metric].mean()
     # print(dfAvg)
 
-    ax = pd.pivot_table(dfAlg, index='Dataset', columns='Algoritm')[metric].plot.bar(alpha=0.75, rot=0)
+    ax = pd.pivot_table(dfAlg, index='Proj', columns='Algorithm', values=metric).plot.bar(alpha=0.75, rot=0)
     # for p in ax.patches:
     #     ax.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
     ax.set_ylabel(metric)
     ax.set_xlabel('')
     plt.legend(loc='lower right')
-    plt.savefig('results/algs-set1'+metric+'.pdf')
+    plt.xticks(rotation=45, ha='right')
+    plt.subplots_adjust(bottom=0.2)
+    plt.savefig('results/charts/algs-Str'+metric+'.pdf')
 
-    dfAlg = df.query("window == 3")
-    dfAlg = dfAlg.query("model == 'model2'")
+    dfAlg = df.query("App == 'slw'")
+    dfAlg = dfAlg.query("Fs == 'StrEvo'")
     # dfSet['window'] = dfSet['window'].replace({0: 'trad', 3: 'our'})
-    dfAvg = dfAlg.groupby(['Dataset', 'Algoritm'])[metric].mean()
+    dfAvg = dfAlg.groupby(['Proj', 'Algorithm'])[metric].mean()
     # print(dfAvg)
 
-    ax = pd.pivot_table(dfAlg, index='Dataset', columns='Algoritm')[metric].plot.bar(alpha=0.75, rot=0)
+    ax = pd.pivot_table(dfAlg, index='Proj', columns='Algorithm', values=metric).plot.bar(alpha=0.75, rot=0)
     # for p in ax.patches:
     #     ax.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
     ax.set_ylabel(metric)
     ax.set_xlabel('')
     plt.legend(loc='lower right')
-    plt.savefig('results/algs-set2'+metric+'.pdf')
+    plt.xticks(rotation=45, ha='right')
+    plt.subplots_adjust(bottom=0.2)
+    plt.savefig('results/charts/algs-StrEvo'+metric+'.pdf')
 
-    dfAlg = df.query("window == 3")
-    dfAlg = dfAlg.query("model == 'model3'")
+    dfAlg = df.query("App == 'slw'")
+    dfAlg = dfAlg.query("Fs == 'Evo'")
     # dfSet['window'] = dfSet['window'].replace({0: 'trad', 3: 'our'})
-    dfAvg = dfAlg.groupby(['Dataset', 'Algoritm'])[metric].mean()
+    dfAvg = dfAlg.groupby(['Proj', 'Algorithm'])[metric].mean()
     # print(dfAvg)
 
-    ax = pd.pivot_table(dfAlg, index='Dataset', columns='Algoritm')[metric].plot.bar(alpha=0.75, rot=0)
+    ax = pd.pivot_table(dfAlg, index='Proj', columns='Algorithm', values=metric).plot.bar(alpha=0.75, rot=0)
     # for p in ax.patches:
     #     ax.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
     ax.set_ylabel(metric)
     ax.set_xlabel('')
     plt.legend(loc='lower right')
-    plt.savefig('results/algs-set3'+metric+'.pdf')
+    plt.xticks(rotation=45, ha='right')
+    plt.subplots_adjust(bottom=0.2)
+    plt.savefig('results/charts/algs-Evo'+metric+'.pdf')
 
-    dfAlg = df.query("window == 3")
-    dfAlg = dfAlg.query("model == 'model4'")
-    # dfSet['window'] = dfSet['window'].replace({0: 'trad', 3: 'our'})
-    dfAvg = dfAlg.groupby(['Dataset', 'Algoritm'])[metric].mean()
+    dfAlg = df.query("App == 'slw'")
+    dfAvg = dfAlg.groupby(['Proj', 'Algorithm'])[metric].mean()
     # print(dfAvg)
 
-    ax = pd.pivot_table(dfAlg, index='Dataset', columns='Algoritm')[metric].plot.bar(alpha=0.75, rot=0)
+    ax = pd.pivot_table(dfAlg, index='Proj', columns='Algorithm',values=metric).plot.bar(alpha=0.75, rot=0)
     # for p in ax.patches:
     #     ax.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
     ax.set_ylabel(metric)
     ax.set_xlabel('')
     plt.legend(loc='lower right')
-    plt.savefig('results/algs-set4'+metric+'.pdf')
-
-    dfAlg = df.query("window == 3")
-    dfAlg = dfAlg.query("model == 'model6'")
-    # dfSet['window'] = dfSet['window'].replace({0: 'trad', 3: 'our'})
-    dfAvg = dfAlg.groupby(['Dataset', 'Algoritm'])[metric].mean()
-    # print(dfAvg)
-
-    ax = pd.pivot_table(dfAlg, index='Dataset', columns='Algoritm')[metric].plot.bar(alpha=0.75, rot=0)
-    # for p in ax.patches:
-    #     ax.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
-    ax.set_ylabel(metric)
-    ax.set_xlabel('')
-    plt.legend(loc='lower right')
-    plt.savefig('results/algs-set6'+metric+'.pdf')
-
-    dfAlg = df.query("window == 3")
-    dfAlg = dfAlg.query("model == 'model7'")
-    # dfSet['window'] = dfSet['window'].replace({0: 'trad', 3: 'our'})
-    dfAvg = dfAlg.groupby(['Dataset', 'Algoritm'])[metric].mean()
-    # print(dfAvg)
-
-    ax = pd.pivot_table(dfAlg, index='Dataset', columns='Algoritm')[metric].plot.bar(alpha=0.75, rot=0)
-    # for p in ax.patches:
-    #     ax.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
-    ax.set_ylabel(metric)
-    ax.set_xlabel('')
-    plt.legend(loc='lower right')
-    plt.savefig('results/algs-set7'+metric+'.pdf')
-
-
-
-    dfAlg = df.query("window == 3")
-    dfAvg = dfAlg.groupby(['Dataset', 'Algoritm'])[metric].mean()
-    # print(dfAvg)
-
-    ax = pd.pivot_table(dfAlg, index='Dataset', columns='Algoritm')[metric].plot.bar(alpha=0.75, rot=0)
-    # for p in ax.patches:
-    #     ax.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
-    ax.set_ylabel(metric)
-    ax.set_xlabel('')
-    plt.legend(loc='lower right')
-    plt.savefig('results/algs-sets1_2_3_4_5_6'+metric+'.pdf')
+    plt.xticks(rotation=45, ha='right')
+    plt.subplots_adjust(bottom=0.2)
+    plt.savefig('results/charts/algs-all'+metric+'.pdf')
 
 
     plt.show()
